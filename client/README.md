@@ -14,3 +14,15 @@
                 <TableCell align="right">{run.distance}</TableCell>
                 <TableCell align="right">{run.duration}</TableCell>
                 <TableCell align="right">{run.pace}</TableCell>
+
+<TableHead>
+          <TableRow>
+            <TableCell></TableCell>
+            <TableCell align="right">Name</TableCell>
+            <TableCell align="right">Date</TableCell>
+            <TableCell align="right">Distance&nbsp;(m)</TableCell>
+            <TableCell align="right">Duration&nbsp;(s)</TableCell>
+            <TableCell align="right">Pace&nbsp;(m/s)</TableCell>
+            <TableCell align="right"></TableCell>
+          </TableRow>
+        </TableHead>
