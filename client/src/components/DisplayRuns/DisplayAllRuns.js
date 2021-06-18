@@ -9,8 +9,8 @@ import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import Paper from "@material-ui/core/Paper";
 import Input from "@material-ui/core/Input";
-
 import IconButton from "@material-ui/core/IconButton";
+
 import DeleteIcon from "@material-ui/icons/DeleteOutlined";
 import EditIcon from "@material-ui/icons/EditOutlined";
 import DoneIcon from "@material-ui/icons/DoneAllTwoTone";
@@ -32,6 +32,10 @@ const useStyles = makeStyles({
     minWidth: 650,
   },
 });
+
+//------------------- FOR SORTABLE FUNCTIONALITY -------------------
+
+//------------------- FOR EDITABLE FUNCTIONALITY -------------------
 
 const createData = (id, name, date, distance, duration, pace) => ({
   id,
@@ -68,6 +72,7 @@ const CustomTableCell = ({ run, name, onChange }) => {
 export default function DisplayAllRuns() {
   const classes = useStyles();
   const [runs, setRuns] = useState([]);
+  const [previous, setPrevious] = useState({});
 
   useEffect(() => {
     axios
@@ -92,9 +97,20 @@ export default function DisplayAllRuns() {
       });
   }, []);
 
-  const onToggleEditMode = (id) => {
+  const onToggleEditMode = (run, id) => {
+    if (!previous[id]) {
+      setPrevious((state) => ({ ...state, [id]: run }));
+    } else {
+      setPrevious((state) => {
+        delete state[id];
+        return state;
+      });
+    }
     setRuns((state) => {
       return runs.map((run) => {
+        axios
+          .post("http://localhost:5000/runs/edit/" + run.id, run)
+          .then((res) => console.log(res.data));
         if (run.id === id) {
           return { ...run, isEditMode: !run.isEditMode };
         }
@@ -102,8 +118,6 @@ export default function DisplayAllRuns() {
       });
     });
   };
-
-  const [previous, setPrevious] = React.useState({});
 
   const onChange = (e, run) => {
     if (!previous[run.id]) {
@@ -124,16 +138,17 @@ export default function DisplayAllRuns() {
   const onRevert = (id) => {
     const newRuns = runs.map((run) => {
       if (run.id === id) {
-        return previous[id] ? previous[id] : run;
+        return previous[id]
+          ? { ...previous[id], isEditMode: !run.isEditMode }
+          : { ...run, isEditMode: !run.isEditMode };
       }
       return run;
     });
-    setRuns(newRuns);
     setPrevious((state) => {
       delete state[id];
       return state;
     });
-    onToggleEditMode(id);
+    setRuns(newRuns);
   };
 
   const deleteRun = (id) => {
@@ -166,7 +181,7 @@ export default function DisplayAllRuns() {
                     <>
                       <IconButton
                         aria-label="done"
-                        onClick={() => onToggleEditMode(run.id)}
+                        onClick={() => onToggleEditMode(run, run.id)}
                       >
                         <DoneIcon />
                       </IconButton>
@@ -181,7 +196,7 @@ export default function DisplayAllRuns() {
                     <>
                       <IconButton
                         aria-label="edit"
-                        onClick={() => onToggleEditMode(run.id)}
+                        onClick={() => onToggleEditMode(run, run.id)}
                       >
                         <EditIcon />
                       </IconButton>

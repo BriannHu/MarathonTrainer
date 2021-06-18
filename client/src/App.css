@@ -5,3 +5,15 @@
 .container {
   padding-left: 150px;
 }
+
+.container-left {
+  height: 100vh;
+
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+.container-right {
+  padding-top: 1rem;
+}

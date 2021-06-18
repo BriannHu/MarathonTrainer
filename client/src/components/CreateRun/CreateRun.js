@@ -49,6 +49,10 @@ export default function CreateRun2() {
     });
   }, [users]);
 
+  useEffect(() => {
+    setPace(distance / duration);
+  }, [distance, duration]);
+
   const onSubmit = (e) => {
     e.preventDefault();
 
@@ -112,9 +116,7 @@ export default function CreateRun2() {
             label="Distance"
             type="number"
             value={distance}
-            onChange={(e) => {
-              setDistance(e.target.value);
-            }}
+            onChange={(e) => setDistance(e.target.value)}
             InputLabelProps={{
               shrink: true,
             }}
@@ -126,9 +128,7 @@ export default function CreateRun2() {
             label="Duration"
             type="number"
             value={duration}
-            onChange={(e) => {
-              setDuration(e.target.value);
-            }}
+            onChange={(e) => setDuration(e.target.value)}
             InputLabelProps={{
               shrink: true,
             }}
@@ -139,7 +139,6 @@ export default function CreateRun2() {
             id="standard-number"
             label="Pace"
             value={pace}
-            onChange={(e) => setPace(e.target.value)}
             InputProps={{
               readOnly: true,
             }}
