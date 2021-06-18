@@ -58,3 +58,15 @@ onClick={() => deleteRun(run.id)} >
 clsx(classes.root, {
 [classes.highlight]: numSelected > 0,
 })}
+
+        <Tooltip title="Delete">
+          <IconButton
+            aria-label="delete"
+            onClick={() => {
+              selected.map((id) => deleteRun(id));
+              setRuns(runs.filter((run) => !selected.includes(run.id)));
+            }}
+          >
+            <DeleteIcon />
+          </IconButton>
+        </Tooltip>

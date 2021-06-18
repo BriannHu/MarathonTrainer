@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 
 import { lighten, makeStyles } from "@material-ui/core/styles";
+import Button from "@material-ui/core/Button";
 import Checkbox from "@material-ui/core/Checkbox";
 import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
@@ -11,15 +12,12 @@ import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import TableSortLabel from "@material-ui/core/TableSortLabel";
 import Toolbar from "@material-ui/core/Toolbar";
-import Tooltip from "@material-ui/core/Tooltip";
 import Typography from "@material-ui/core/Typography";
-
 import Paper from "@material-ui/core/Paper";
 import Input from "@material-ui/core/Input";
 import IconButton from "@material-ui/core/IconButton";
 
 import DeleteIcon from "@material-ui/icons/DeleteOutlined";
-// import EditIcon from "@material-ui/icons/EditOutlined";
 import DoneIcon from "@material-ui/icons/DoneAllTwoTone";
 import RevertIcon from "@material-ui/icons/NotInterestedOutlined";
 
@@ -114,15 +112,15 @@ const headCells = [
     id: "distance",
     numeric: true,
     disablePadding: false,
-    label: "Distance (m)",
+    label: "Distance",
   },
   {
     id: "duration",
     numeric: true,
     disablePadding: false,
-    label: "Duration (s)",
+    label: "Duration",
   },
-  { id: "pace", numeric: true, disablePadding: false, label: "Pace (m/s)" },
+  { id: "pace", numeric: true, disablePadding: false, label: "Pace" },
 ];
 
 function EnhancedTableHead(props) {
@@ -243,33 +241,44 @@ const useToolbarStyles = makeStyles((theme) => ({
 
 const EnhancedTableToolbar = (props) => {
   const classes = useToolbarStyles();
-  const { numSelected, deleteRun, selected, setRuns, runs } = props;
+  const { numSelected, deleteRun, selected, setSelected, setRuns, runs } =
+    props;
 
   return (
     <Toolbar className={classes.root}>
       <Typography
         className={classes.title}
-        variant="h6"
+        variant="h5"
         id="tableTitle"
         component="div"
       >
-        Runs
+        Summary
       </Typography>
 
       {numSelected > 0 ? (
-        <Tooltip title="Delete">
-          <IconButton
-            aria-label="delete"
-            onClick={() => {
-              selected.map((id) => deleteRun(id));
-              setRuns(runs.filter((run) => !selected.includes(run.id)));
-            }}
-          >
-            <DeleteIcon />
-          </IconButton>
-        </Tooltip>
+        <Button
+          variant="contained"
+          color="primary"
+          className={classes.button}
+          startIcon={<DeleteIcon />}
+          onClick={() => {
+            selected.map((id) => deleteRun(id));
+            setRuns(runs.filter((run) => !selected.includes(run.id)));
+            setSelected([]);
+          }}
+        >
+          Delete
+        </Button>
       ) : (
-        <></>
+        <Button
+          disabled
+          variant="contained"
+          color="secondary"
+          className={classes.button}
+          startIcon={<DeleteIcon />}
+        >
+          Delete
+        </Button>
       )}
     </Toolbar>
   );
@@ -422,6 +431,7 @@ export default function DisplayAllRuns() {
         numSelected={selected.length}
         deleteRun={deleteRun}
         selected={selected}
+        setSelected={setSelected}
         setRuns={setRuns}
         runs={runs}
       />
