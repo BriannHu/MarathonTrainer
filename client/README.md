@@ -26,3 +26,35 @@
             <TableCell align="right"></TableCell>
           </TableRow>
         </TableHead>
+
+{run.isEditMode ? (
+<>
+<IconButton
+aria-label="done"
+onClick={() => onToggleEditMode(run, run.id)} >
+<DoneIcon />
+</IconButton>
+<IconButton
+aria-label="revert"
+onClick={() => onRevert(run.id)} >
+<RevertIcon />
+</IconButton>
+</>
+) : (
+<>
+<IconButton
+aria-label="edit"
+onClick={() => onToggleEditMode(run, run.id)} >
+<EditIcon />
+</IconButton>
+<IconButton
+aria-label="delete"
+onClick={() => deleteRun(run.id)} >
+<DeleteIcon />
+</IconButton>
+</>
+)}
+
+clsx(classes.root, {
+[classes.highlight]: numSelected > 0,
+})}

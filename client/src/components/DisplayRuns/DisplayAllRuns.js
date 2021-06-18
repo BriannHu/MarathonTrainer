@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 
-import { makeStyles } from "@material-ui/core/styles";
+import { lighten, makeStyles } from "@material-ui/core/styles";
+import Checkbox from "@material-ui/core/Checkbox";
 import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
 import TableCell from "@material-ui/core/TableCell";
@@ -9,29 +10,56 @@ import TableContainer from "@material-ui/core/TableContainer";
 import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import TableSortLabel from "@material-ui/core/TableSortLabel";
+import Toolbar from "@material-ui/core/Toolbar";
+import Tooltip from "@material-ui/core/Tooltip";
+import Typography from "@material-ui/core/Typography";
+
 import Paper from "@material-ui/core/Paper";
 import Input from "@material-ui/core/Input";
 import IconButton from "@material-ui/core/IconButton";
 
 import DeleteIcon from "@material-ui/icons/DeleteOutlined";
-import EditIcon from "@material-ui/icons/EditOutlined";
+// import EditIcon from "@material-ui/icons/EditOutlined";
 import DoneIcon from "@material-ui/icons/DoneAllTwoTone";
 import RevertIcon from "@material-ui/icons/NotInterestedOutlined";
 
 import axios from "axios";
 
 const useStyles = makeStyles({
+  editIcon: {
+    marginLeft: "2.75rem",
+    marginRight: 0,
+  },
+  header: {
+    backgroundColor: "#e8eafc",
+    height: 50,
+  },
+  headerCell: {
+    textTransform: "uppercase",
+  },
+  headerCellLabel: {
+    color: "#333333",
+    fontWeight: 600,
+  },
   icon1: { marginRight: "1rem" },
   icon2: { marginLeft: "1rem" },
   link: {
     color: "black !important",
   },
-
   selectTableCell: {
-    width: 150,
+    width: 130,
   },
   table: {
     minWidth: 650,
+  },
+  tableCell: {},
+  table_row: {
+    "&.Mui-selected, &.Mui-selected:hover": {
+      backgroundColor: "rgba(232, 234, 252, 0.5)",
+      "& > .MuiTableCell-root": {
+        color: "black",
+      },
+    },
   },
   visuallyHidden: {
     border: 0,
@@ -78,7 +106,7 @@ const headCells = [
   {
     id: "name",
     numeric: true,
-    disablePadding: true,
+    disablePadding: false,
     label: "Name",
   },
   { id: "date", numeric: true, disablePadding: false, label: "Date" },
@@ -98,24 +126,41 @@ const headCells = [
 ];
 
 function EnhancedTableHead(props) {
-  const { classes, order, orderBy, onRequestSort } = props;
+  const {
+    classes,
+    numSelected,
+    onSelectAllClick,
+    order,
+    orderBy,
+    onRequestSort,
+    rowCount,
+  } = props;
   const createSortHandler = (property) => (event) => {
     onRequestSort(event, property);
   };
 
   return (
-    <TableHead>
+    <TableHead className={classes.header}>
       <TableRow>
-        <TableCell padding="checkbox"></TableCell>
+        <TableCell padding="checkbox">
+          <Checkbox
+            indeterminate={numSelected > 0 && numSelected < rowCount}
+            checked={rowCount > 0 && numSelected === rowCount}
+            color="primary"
+            onChange={onSelectAllClick}
+            inputProps={{ "aria-label": "select all runs" }}
+          />
+        </TableCell>
         {headCells.map((headCell) => (
           <TableCell
+            className={classes.headerCell}
             key={headCell.id}
             align={headCell.numeric ? "right" : "left"}
-            padding={headCell.disablePadding ? "none" : "default"}
             sortDirection={orderBy === headCell.id ? order : false}
           >
             <TableSortLabel
               active={orderBy === headCell.id}
+              className={classes.headerCellLabel}
               direction={orderBy === headCell.id ? order : "asc"}
               onClick={createSortHandler(headCell.id)}
             >
@@ -128,6 +173,7 @@ function EnhancedTableHead(props) {
             </TableSortLabel>
           </TableCell>
         ))}
+        <TableCell className={classes.headerCell}></TableCell>
       </TableRow>
     </TableHead>
   );
@@ -174,6 +220,65 @@ const CustomTableCell = ({ run, name, onChange }) => {
   );
 };
 
+//------------------- FOR SELECT/DELETE FUNCTIONALITY -------------------
+const useToolbarStyles = makeStyles((theme) => ({
+  root: {
+    paddingLeft: theme.spacing(4),
+    paddingRight: theme.spacing(1),
+  },
+  highlight:
+    theme.palette.type === "light"
+      ? {
+          color: theme.palette.info.main,
+          backgroundColor: lighten(theme.palette.info.light, 0.9),
+        }
+      : {
+          color: theme.palette.text.primary,
+          backgroundColor: theme.palette.info.dark,
+        },
+  title: {
+    flex: "1 1 100%",
+  },
+}));
+
+const EnhancedTableToolbar = (props) => {
+  const classes = useToolbarStyles();
+  const { numSelected, deleteRun, selected, setRuns, runs } = props;
+
+  return (
+    <Toolbar className={classes.root}>
+      <Typography
+        className={classes.title}
+        variant="h6"
+        id="tableTitle"
+        component="div"
+      >
+        Runs
+      </Typography>
+
+      {numSelected > 0 ? (
+        <Tooltip title="Delete">
+          <IconButton
+            aria-label="delete"
+            onClick={() => {
+              selected.map((id) => deleteRun(id));
+              setRuns(runs.filter((run) => !selected.includes(run.id)));
+            }}
+          >
+            <DeleteIcon />
+          </IconButton>
+        </Tooltip>
+      ) : (
+        <></>
+      )}
+    </Toolbar>
+  );
+};
+
+EnhancedTableToolbar.propTypes = {
+  numSelected: PropTypes.number.isRequired,
+};
+
 export default function DisplayAllRuns() {
   const classes = useStyles();
   // stores runs to be mapped to rows, pulled from db
@@ -187,6 +292,8 @@ export default function DisplayAllRuns() {
   // default is ascending by date
   const [order, setOrder] = useState("asc");
   const [orderBy, setOrderBy] = useState("date");
+
+  const [selected, setSelected] = useState([]);
 
   useEffect(() => {
     setRuns([]); // prevents more entries from being added each render
@@ -270,7 +377,6 @@ export default function DisplayAllRuns() {
     axios
       .delete("http://localhost:5000/runs/" + id)
       .then((res) => console.log(res.data));
-    setRuns(runs.filter((el) => el.id !== id));
   };
 
   const handleRequestSort = (e, property) => {
@@ -279,62 +385,129 @@ export default function DisplayAllRuns() {
     setOrderBy(property);
   };
 
+  const handleSelectAllClick = (e) => {
+    if (e.target.checked) {
+      const newSelecteds = runs.map((n) => n.id);
+      setSelected(newSelecteds);
+      return;
+    }
+    setSelected([]);
+  };
+
+  const handleSelectClick = (e, name) => {
+    const selectedIndex = selected.indexOf(name);
+    let newSelected = [];
+
+    if (selectedIndex === -1) {
+      newSelected = newSelected.concat(selected, name);
+    } else if (selectedIndex === 0) {
+      newSelected = newSelected.concat(selected.slice(1));
+    } else if (selectedIndex === selected.length - 1) {
+      newSelected = newSelected.concat(selected.slice(0, -1));
+    } else if (selectedIndex > 0) {
+      newSelected = newSelected.concat(
+        selected.slice(0, selectedIndex),
+        selected.slice(selectedIndex + 1)
+      );
+    }
+
+    setSelected(newSelected);
+  };
+
+  const isSelected = (name) => selected.indexOf(name) !== -1;
+
   return (
-    <TableContainer component={Paper}>
-      <Table className={classes.table} aria-label="simple table">
-        <EnhancedTableHead
-          classes={classes}
-          order={order}
-          orderBy={orderBy}
-          onRequestSort={handleRequestSort}
-        />
-        <TableBody>
-          {stableSort(runs, getComparator(order, orderBy)).map((run) => {
-            return (
-              <TableRow key={run._id}>
-                <TableCell className={classes.selectTableCell}>
-                  {run.isEditMode ? (
-                    <>
-                      <IconButton
-                        aria-label="done"
-                        onClick={() => onToggleEditMode(run, run.id)}
-                      >
-                        <DoneIcon />
-                      </IconButton>
-                      <IconButton
-                        aria-label="revert"
-                        onClick={() => onRevert(run.id)}
-                      >
-                        <RevertIcon />
-                      </IconButton>
-                    </>
-                  ) : (
-                    <>
-                      <IconButton
-                        aria-label="edit"
-                        onClick={() => onToggleEditMode(run, run.id)}
-                      >
-                        <EditIcon />
-                      </IconButton>
-                      <IconButton
-                        aria-label="delete"
-                        onClick={() => deleteRun(run.id)}
-                      >
-                        <DeleteIcon />
-                      </IconButton>
-                    </>
-                  )}
-                </TableCell>
-                <CustomTableCell {...{ run, name: "name", onChange }} />
-                <CustomTableCell {...{ run, name: "date", onChange }} />
-                <CustomTableCell {...{ run, name: "distance", onChange }} />
-                <CustomTableCell {...{ run, name: "duration", onChange }} />
-                <CustomTableCell {...{ run, name: "pace", onChange }} />
-              </TableRow>
-            );
-          })}
-        </TableBody>
-      </Table>
-    </TableContainer>
+    <Paper className={classes.paper}>
+      <EnhancedTableToolbar
+        numSelected={selected.length}
+        deleteRun={deleteRun}
+        selected={selected}
+        setRuns={setRuns}
+        runs={runs}
+      />
+      <TableContainer>
+        <Table className={classes.table} aria-label="data-table" size="small">
+          <EnhancedTableHead
+            classes={classes}
+            numSelected={selected.length}
+            order={order}
+            orderBy={orderBy}
+            onSelectAllClick={handleSelectAllClick}
+            onRequestSort={handleRequestSort}
+            rowCount={runs.length}
+          />
+          <TableBody>
+            {stableSort(runs, getComparator(order, orderBy)).map(
+              (run, index) => {
+                const isItemSelected = isSelected(run.id);
+                const labelId = `enhanced-table-checkbox-${index}`;
+
+                return (
+                  <TableRow
+                    classes={{ root: classes.table_row }}
+                    hover
+                    key={run._id}
+                    selected={isItemSelected}
+                  >
+                    <TableCell padding="checkbox">
+                      <Checkbox
+                        color="primary"
+                        checked={isItemSelected}
+                        inputProps={{ "aria-labelledby": labelId }}
+                        onClick={(e) => handleSelectClick(e, run.id)}
+                      />
+                    </TableCell>
+                    <CustomTableCell {...{ run, name: "name", onChange }} />
+                    <CustomTableCell {...{ run, name: "date", onChange }} />
+                    <CustomTableCell {...{ run, name: "distance", onChange }} />
+                    <CustomTableCell {...{ run, name: "duration", onChange }} />
+                    <CustomTableCell {...{ run, name: "pace", onChange }} />
+                    <TableCell className={classes.selectTableCell}>
+                      {run.isEditMode ? (
+                        <>
+                          <IconButton
+                            aria-label="done"
+                            onClick={() => onToggleEditMode(run, run.id)}
+                          >
+                            <DoneIcon />
+                          </IconButton>
+                          <IconButton
+                            aria-label="revert"
+                            onClick={() => onRevert(run.id)}
+                          >
+                            <RevertIcon />
+                          </IconButton>
+                        </>
+                      ) : (
+                        <>
+                          <IconButton aria-label="placeholder">
+                            <i
+                              className="far fa-edit"
+                              style={{
+                                fontSize: "1.2rem",
+                                visibility: "hidden",
+                              }}
+                            ></i>
+                          </IconButton>
+                          <IconButton
+                            aria-label="edit"
+                            onClick={() => onToggleEditMode(run, run.id)}
+                          >
+                            <i
+                              className="far fa-edit"
+                              style={{ color: "#bfbfbf", fontSize: "1.5rem" }}
+                            ></i>
+                          </IconButton>
+                        </>
+                      )}
+                    </TableCell>
+                  </TableRow>
+                );
+              }
+            )}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </Paper>
   );
 }
