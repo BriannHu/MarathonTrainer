@@ -26,6 +26,11 @@ const runSchema = new Schema(
       type: Number,
       required: false,
     },
+    indoor: {
+      type: Boolean,
+      default: false,
+      required: false,
+    },
   },
   { timestamps: true }
 );
