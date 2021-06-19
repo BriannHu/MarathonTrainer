@@ -3,7 +3,6 @@ const router = require("express").Router();
 
 const fs = require("fs");
 const moment = require("moment");
-const mdq = require("mongo-date-query");
 const json2csv = require("json2csv").parse;
 const path = require("path");
 const fields = ["name", "date", "distance", "duration", "pace"];

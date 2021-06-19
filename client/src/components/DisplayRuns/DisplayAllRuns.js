@@ -4,6 +4,7 @@ import PropTypes from "prop-types";
 import { lighten, makeStyles } from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
 import Checkbox from "@material-ui/core/Checkbox";
+
 import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
 import TableCell from "@material-ui/core/TableCell";
@@ -36,9 +37,6 @@ const useStyles = makeStyles({
     backgroundColor: "#e8eafc",
     height: 50,
   },
-  headerCell: {
-    textTransform: "uppercase",
-  },
   headerCellLabel: {
     color: "#333333",
     fontWeight: 600,
@@ -52,7 +50,7 @@ const useStyles = makeStyles({
     width: 130,
   },
   table: {
-    minWidth: 650,
+    minWidth: 800,
   },
   tableCell: {},
   table_row: {
@@ -227,6 +225,10 @@ const useToolbarStyles = makeStyles((theme) => ({
   button: {
     margin: theme.spacing(1),
   },
+  formControl: {
+    margin: "0 3rem 0 0.5rem",
+    minWidth: 250,
+  },
   root: {
     paddingLeft: theme.spacing(4),
     paddingRight: theme.spacing(1),
@@ -242,7 +244,10 @@ const useToolbarStyles = makeStyles((theme) => ({
           backgroundColor: theme.palette.info.dark,
         },
   title: {
-    flex: "1 1 100%",
+    fontSize: 14,
+    fontWeight: 700,
+    flex: "1 1 auto",
+    textTransform: "uppercase",
   },
 }));
 
@@ -268,7 +273,7 @@ const EnhancedTableToolbar = (props) => {
     <Toolbar className={classes.root}>
       <Typography
         className={classes.title}
-        variant="h5"
+        color="textPrimary"
         id="tableTitle"
         component="div"
       >
@@ -459,7 +464,7 @@ export default function DisplayAllRuns() {
   const isSelected = (name) => selected.indexOf(name) !== -1;
 
   return (
-    <Paper className={classes.paper}>
+    <Paper className={classes.paper} elevation={2}>
       <EnhancedTableToolbar
         numSelected={selected.length}
         deleteRun={deleteRun}
