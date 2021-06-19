@@ -50,7 +50,7 @@ export default function CreateRun2() {
   }, [users]);
 
   useEffect(() => {
-    setPace(distance / duration);
+    setPace(duration / distance);
   }, [distance, duration]);
 
   const onSubmit = (e) => {

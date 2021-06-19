@@ -12,6 +12,7 @@ import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import TableSortLabel from "@material-ui/core/TableSortLabel";
 import Toolbar from "@material-ui/core/Toolbar";
+import Tooltip from "@material-ui/core/Tooltip";
 import Typography from "@material-ui/core/Typography";
 import Paper from "@material-ui/core/Paper";
 import Input from "@material-ui/core/Input";
@@ -19,9 +20,12 @@ import IconButton from "@material-ui/core/IconButton";
 
 import DeleteIcon from "@material-ui/icons/DeleteOutlined";
 import DoneIcon from "@material-ui/icons/DoneAllTwoTone";
+import ExportIcon from "@material-ui/icons/OpenInNewOutlined";
 import RevertIcon from "@material-ui/icons/NotInterestedOutlined";
 
 import axios from "axios";
+
+import { getPaceDisplay, getInfoDisplay } from "./Utilities";
 
 const useStyles = makeStyles({
   editIcon: {
@@ -209,10 +213,10 @@ const CustomTableCell = ({ run, name, onChange }) => {
           onChange={(e) => onChange(e, run)}
           className={classes.input}
         />
-      ) : name === "date" ? (
-        String(run[name]).substring(0, 10)
+      ) : name === "pace" ? (
+        getPaceDisplay(run["distance"], run["duration"])
       ) : (
-        run[name]
+        getInfoDisplay(run[name], name)
       )}
     </TableCell>
   );
@@ -220,6 +224,9 @@ const CustomTableCell = ({ run, name, onChange }) => {
 
 //------------------- FOR SELECT/DELETE FUNCTIONALITY -------------------
 const useToolbarStyles = makeStyles((theme) => ({
+  button: {
+    margin: theme.spacing(1),
+  },
   root: {
     paddingLeft: theme.spacing(4),
     paddingRight: theme.spacing(1),
@@ -239,11 +246,24 @@ const useToolbarStyles = makeStyles((theme) => ({
   },
 }));
 
+function exportRuns() {
+  axios.get("http://localhost:5000/exports/").then((response) => {
+    const filename = response.data; // returns end of url in form of csv-xxxx.csv, x are random numbers
+    axios.get("http://localhost:5000/exports/" + filename).then((response) => {
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", filename);
+      document.body.appendChild(link);
+      link.click();
+    });
+  });
+}
+
 const EnhancedTableToolbar = (props) => {
   const classes = useToolbarStyles();
   const { numSelected, deleteRun, selected, setSelected, setRuns, runs } =
     props;
-
   return (
     <Toolbar className={classes.root}>
       <Typography
@@ -254,21 +274,34 @@ const EnhancedTableToolbar = (props) => {
       >
         Summary
       </Typography>
-
-      {numSelected > 0 ? (
+      <Tooltip title="Export All">
         <Button
           variant="contained"
           color="primary"
           className={classes.button}
-          startIcon={<DeleteIcon />}
-          onClick={() => {
-            selected.map((id) => deleteRun(id));
-            setRuns(runs.filter((run) => !selected.includes(run.id)));
-            setSelected([]);
-          }}
+          startIcon={<ExportIcon />}
+          onClick={() => exportRuns()}
         >
-          Delete
+          Export
         </Button>
+      </Tooltip>
+
+      {numSelected > 0 ? (
+        <Tooltip title="Delete Selected">
+          <Button
+            variant="contained"
+            color="secondary"
+            className={classes.button}
+            startIcon={<DeleteIcon />}
+            onClick={() => {
+              selected.map((id) => deleteRun(id));
+              setRuns(runs.filter((run) => !selected.includes(run.id)));
+              setSelected([]);
+            }}
+          >
+            Delete
+          </Button>
+        </Tooltip>
       ) : (
         <Button
           disabled
@@ -455,7 +488,6 @@ export default function DisplayAllRuns() {
                 return (
                   <TableRow
                     classes={{ root: classes.table_row }}
-                    hover
                     key={run._id}
                     selected={isItemSelected}
                   >
@@ -490,7 +522,7 @@ export default function DisplayAllRuns() {
                         </>
                       ) : (
                         <>
-                          <IconButton aria-label="placeholder">
+                          <IconButton aria-label="placeholder" disabled>
                             <i
                               className="far fa-edit"
                               style={{
