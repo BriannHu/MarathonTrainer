@@ -11,7 +11,6 @@ const useStyles = makeStyles((theme) => ({
   toolbar: {
     display: "flex",
     alignItems: "center",
-    marginTop: theme.spacing(1),
     justifyContent: "flex-end",
     padding: "0 8px",
     ...theme.mixins.toolbar,

@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import classNames from "classnames";
 
 import { makeStyles } from "@material-ui/core/styles";
+import { colors } from "@material-ui/core";
 import AppBar from "@material-ui/core/AppBar";
 
 import Drawer from "@material-ui/core/Drawer";
@@ -36,10 +37,9 @@ const useStyles = makeStyles((theme) => ({
       duration: theme.transitions.duration.enteringScreen,
     }),
   },
-
   menuButton: {
-    marginLeft: 12,
-    marginRight: 36,
+    marginLeft: theme.spacing(1),
+    marginRight: theme.spacing(2),
   },
   menuButtonIconClosed: {
     transition: theme.transitions.create(["transform"], {
@@ -55,7 +55,6 @@ const useStyles = makeStyles((theme) => ({
     }),
     transform: "rotate(180deg)",
   },
-
   hide: {
     display: "none",
   },
@@ -65,6 +64,8 @@ const useStyles = makeStyles((theme) => ({
     whiteSpace: "nowrap",
   },
   drawerOpen: {
+    backgroundColor: colors.indigo[900],
+    color: "white",
     width: drawerWidth,
     transition: theme.transitions.create("width", {
       easing: theme.transitions.easing.sharp,
@@ -72,6 +73,8 @@ const useStyles = makeStyles((theme) => ({
     }),
   },
   drawerClose: {
+    backgroundColor: colors.indigo[900],
+    color: "white",
     transition: theme.transitions.create("width", {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen,
@@ -81,6 +84,12 @@ const useStyles = makeStyles((theme) => ({
     [theme.breakpoints.up("sm")]: {
       width: theme.spacing(9) + 1,
     },
+  },
+  icon: {
+    color: "white",
+  },
+  profile: {
+    marginRight: theme.spacing(2),
   },
   toolbar: {
     display: "flex",
@@ -105,7 +114,7 @@ const useStyles = makeStyles((theme) => ({
 export default function CustomAppBar2() {
   const classes = useStyles();
 
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(false);
 
   const handleDrawerClick = () => {
     setOpen(!open);
@@ -133,7 +142,7 @@ export default function CustomAppBar2() {
           <Typography variant="h6" color="inherit" className={classes.grow}>
             Running Tracker
           </Typography>
-          <IconButton color="inherit">
+          <IconButton color="inherit" className={classes.profile}>
             <AccountCircle />
           </IconButton>
         </Toolbar>
@@ -156,13 +165,13 @@ export default function CustomAppBar2() {
         <List>
           <ListItem button key={"Dashboard"}>
             <ListItemIcon>
-              <DashboardIcon />
+              <DashboardIcon className={classes.icon} />
             </ListItemIcon>
             <ListItemText primary={"Dashboard"} />
           </ListItem>
           <ListItem button key={"Scores"}>
             <ListItemIcon>
-              <ScoreIcon />
+              <ScoreIcon className={classes.icon} />
             </ListItemIcon>
             <ListItemText primary={"Scores"} />
           </ListItem>

@@ -63,8 +63,6 @@ export default function CreateRun2() {
     axios
       .post("http://localhost:5000/runs/add", run)
       .then((res) => console.log(res.data));
-
-    window.location = "/";
   };
 
   return (
@@ -95,7 +93,7 @@ export default function CreateRun2() {
         <FormControl className={classes.formControl}>
           <MuiPickersUtilsProvider utils={DateFnsUtils}>
             <KeyboardDatePicker
-              variant="inline"
+              variant="outlined"
               format="MM/dd/yyyy"
               margin="normal"
               id="date-picker-inline"

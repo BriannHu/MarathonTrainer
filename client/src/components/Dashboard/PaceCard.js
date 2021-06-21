@@ -35,11 +35,6 @@ const useStyles = makeStyles((theme) => ({
   root: {
     minWidth: 275,
   },
-  bullet: {
-    display: "inline-block",
-    margin: "0 2px",
-    transform: "scale(0.8)",
-  },
   gridOuter: {
     justifyContent: "space-between",
   },

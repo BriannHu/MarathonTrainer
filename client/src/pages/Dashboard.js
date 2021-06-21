@@ -1,32 +1,16 @@
 import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
-import Paper from "@material-ui/core/Paper";
 import Grid from "@material-ui/core/Grid";
 
 import DistanceCard from "../components/Dashboard/DistanceCard";
 import DurationCard from "../components/Dashboard/DurationCard";
 import PaceCard from "../components/Dashboard/PaceCard";
 import TargetCard from "../components/Dashboard/TargetCard";
+import Chart from "../components/Dashboard/Chart";
+import Schedule from "../components/Dashboard/Schedule";
+import QuickAdd from "../components/Dashboard/QuickAdd";
 import DisplayAllRuns from "../components/DisplayRuns/DisplayAllRuns";
-const useStyles = makeStyles((theme) => ({
-  container: {
-    marginTop: theme.spacing(2),
-    marginRight: 0,
-    width: "100%",
-  },
-  root: {
-    flexGrow: 1,
-  },
-  paper: {
-    padding: theme.spacing(2),
-    textAlign: "center",
-    color: theme.palette.text.secondary,
-  },
-}));
 
 export default function Dashboard() {
-  const classes = useStyles();
-
   return (
     <Grid container spacing={3}>
       <Grid item xs={12} sm={6} lg={3}>
@@ -45,16 +29,19 @@ export default function Dashboard() {
         <TargetCard />
         {/* <Paper className={classes.paper}>Card 4</Paper> */}
       </Grid>
-      <Grid item xs={12} lg={9} xl={9}>
-        <Paper className={classes.paper}>Card 5</Paper>
+      <Grid item xs={12} lg={8} xl={9}>
+        <Chart />
+        {/* <Paper className={classes.paper}>Card 5</Paper> */}
       </Grid>
-      <Grid item xs={12} lg={3} xl={3}>
-        <Paper className={classes.paper}>Card 6</Paper>
+      <Grid item xs={12} lg={4} xl={3}>
+        <Schedule />
+        {/* <Paper className={classes.paper}>Card 6</Paper> */}
       </Grid>
-      <Grid item xs={12} lg={3}>
-        <Paper className={classes.paper}>Card 7</Paper>
+      <Grid item xs={12} lg={4}>
+        <QuickAdd />
+        {/* <Paper className={classes.paper}>Card 7</Paper> */}
       </Grid>
-      <Grid item xs={12} lg={9}>
+      <Grid item xs={12} lg={8}>
         <DisplayAllRuns />
         {/* <Paper className={classes.paper}>Card 7</Paper> */}
       </Grid>

@@ -51,9 +51,6 @@ const useStyles = makeStyles((theme) => ({
     fontWeight: 700,
     textTransform: "uppercase",
   },
-  pos: {
-    marginBottom: 12,
-  },
 }));
 
 export default function DistanceCard() {

@@ -10,6 +10,7 @@ import TableBody from "@material-ui/core/TableBody";
 import TableCell from "@material-ui/core/TableCell";
 import TableContainer from "@material-ui/core/TableContainer";
 import TableHead from "@material-ui/core/TableHead";
+import TablePagination from "@material-ui/core/TablePagination";
 import TableRow from "@material-ui/core/TableRow";
 import TableSortLabel from "@material-ui/core/TableSortLabel";
 import Toolbar from "@material-ui/core/Toolbar";
@@ -247,6 +248,8 @@ const useToolbarStyles = makeStyles((theme) => ({
     fontSize: 14,
     fontWeight: 700,
     flex: "1 1 auto",
+    marginLeft: theme.spacing(-2),
+    marginTop: theme.spacing(-2),
     textTransform: "uppercase",
   },
 }));
@@ -299,7 +302,7 @@ const EnhancedTableToolbar = (props) => {
             className={classes.button}
             startIcon={<DeleteIcon />}
             onClick={() => {
-              selected.map((id) => deleteRun(id));
+              selected.forEach((id) => deleteRun(id));
               setRuns(runs.filter((run) => !selected.includes(run.id)));
               setSelected([]);
             }}
@@ -340,14 +343,19 @@ export default function DisplayAllRuns() {
   const [order, setOrder] = useState("asc");
   const [orderBy, setOrderBy] = useState("date");
 
+  // sets current selected row(s)
   const [selected, setSelected] = useState([]);
+
+  // sets pagination options
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
 
   useEffect(() => {
     setRuns([]); // prevents more entries from being added each render
     axios
       .get("http://localhost:5000/runs/")
       .then((response) => {
-        response.data.map((run) =>
+        response.data.forEach((run) =>
           setRuns((old) => [
             ...old,
             createData(
@@ -376,7 +384,7 @@ export default function DisplayAllRuns() {
       });
     }
     setRuns((state) => {
-      return runs.map((run) => {
+      return runs.forEach((run) => {
         axios
           .post("http://localhost:5000/runs/edit/" + run.id, run)
           .then((res) => console.log(res.data));
@@ -461,7 +469,18 @@ export default function DisplayAllRuns() {
     setSelected(newSelected);
   };
 
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
+
   const isSelected = (name) => selected.indexOf(name) !== -1;
+  const emptyRows =
+    rowsPerPage - Math.min(rowsPerPage, runs.length - page * rowsPerPage);
 
   return (
     <Paper className={classes.paper} elevation={2}>
@@ -485,8 +504,9 @@ export default function DisplayAllRuns() {
             rowCount={runs.length}
           />
           <TableBody>
-            {stableSort(runs, getComparator(order, orderBy)).map(
-              (run, index) => {
+            {stableSort(runs, getComparator(order, orderBy))
+              .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+              .map((run, index) => {
                 const isItemSelected = isSelected(run.id);
                 const labelId = `enhanced-table-checkbox-${index}`;
 
@@ -550,11 +570,24 @@ export default function DisplayAllRuns() {
                     </TableCell>
                   </TableRow>
                 );
-              }
+              })}
+            {emptyRows > 0 && (
+              <TableRow style={{ height: 61 * emptyRows }}>
+                <TableCell colSpan={6} />
+              </TableRow>
             )}
           </TableBody>
         </Table>
       </TableContainer>
+      <TablePagination
+        component="div"
+        count={runs.length}
+        rowsPerPage={rowsPerPage}
+        rowsPerPageOptions={[5]}
+        page={page}
+        onChangePage={handleChangePage}
+        onChangeRowsPerPage={handleChangeRowsPerPage}
+      />
     </Paper>
   );
 }

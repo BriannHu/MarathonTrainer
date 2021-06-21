@@ -1,10 +1,10 @@
 import React from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { BrowserRouter as Router } from "react-router-dom";
+import { BrowserRouter as Router, Route } from "react-router-dom";
 
 // import CreateUser from "./components/create-user.component";
 
-// import CreateRun from "./components/CreateRun/CreateRun";
+import CreateRun from "./components/CreateRun/CreateRun";
 // import DisplayAllRuns from "./components/DisplayRuns/DisplayAllRuns";
 // import LeftNavbar from "./components/Drawer/LeftNavbar";
 
@@ -15,7 +15,9 @@ import "./App.css";
 function App() {
   return (
     <Router>
-      <MainLayout />
+      <Route path="/" exact component={MainLayout} />
+      <Route path="/create" component={CreateRun} />
+
       {/* <Route path="/" exact component={DisplayAllRuns} /> */}
 
       {/* <Dashboard /> */}
