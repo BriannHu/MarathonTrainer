@@ -302,7 +302,7 @@ const EnhancedTableToolbar = (props) => {
             className={classes.button}
             startIcon={<DeleteIcon />}
             onClick={() => {
-              selected.forEach((id) => deleteRun(id));
+              selected.map((id) => deleteRun(id));
               setRuns(runs.filter((run) => !selected.includes(run.id)));
               setSelected([]);
             }}
@@ -355,7 +355,7 @@ export default function DisplayAllRuns() {
     axios
       .get("http://localhost:5000/runs/")
       .then((response) => {
-        response.data.forEach((run) =>
+        response.data.map((run) =>
           setRuns((old) => [
             ...old,
             createData(
@@ -384,7 +384,7 @@ export default function DisplayAllRuns() {
       });
     }
     setRuns((state) => {
-      return runs.forEach((run) => {
+      return runs.map((run) => {
         axios
           .post("http://localhost:5000/runs/edit/" + run.id, run)
           .then((res) => console.log(res.data));
@@ -481,7 +481,6 @@ export default function DisplayAllRuns() {
   const isSelected = (name) => selected.indexOf(name) !== -1;
   const emptyRows =
     rowsPerPage - Math.min(rowsPerPage, runs.length - page * rowsPerPage);
-
   return (
     <Paper className={classes.paper} elevation={2}>
       <EnhancedTableToolbar
