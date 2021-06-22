@@ -341,7 +341,7 @@ EnhancedTableToolbar.propTypes = {
   numSelected: PropTypes.number.isRequired,
 };
 
-export default function DisplayAllRuns() {
+export default function DisplayAllRuns(props) {
   const classes = useStyles();
   // stores runs to be mapped to rows, pulled from db
   const [runs, setRuns] = useState([]);
@@ -387,7 +387,7 @@ export default function DisplayAllRuns() {
       .catch((error) => {
         console.log(error);
       });
-  }, []);
+  }, [props.allRuns]);
 
   const onToggleEditMode = (run, id) => {
     if (!previous[id]) {

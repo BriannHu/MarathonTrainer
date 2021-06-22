@@ -56,7 +56,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function QuickAdd() {
+export default function QuickAdd(props) {
   const classes = useStyles();
   const [name, setName] = useState("");
   const [date, setDate] = useState(new Date());
@@ -116,11 +116,11 @@ export default function QuickAdd() {
       paceMinutes,
       paceSeconds,
     };
-    console.log(run);
     axios
       .post("http://localhost:5000/runs/add", run)
       .then((res) => console.log(res.data));
-    alert("Run added successfully!");
+
+    props.handleRunChange(run);
   };
 
   const onDistanceChange = (e) => {
