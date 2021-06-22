@@ -27,7 +27,7 @@ import RevertIcon from "@material-ui/icons/NotInterestedOutlined";
 
 import axios from "axios";
 
-import { getPaceDisplay, getInfoDisplay } from "./Utilities";
+import { getInfoDisplay } from "./Utilities";
 
 const useStyles = makeStyles({
   editIcon: {
@@ -189,13 +189,26 @@ EnhancedTableHead.propTypes = {
 
 //------------------- FOR EDITABLE FUNCTIONALITY -------------------
 
-const createData = (id, name, date, distance, duration, pace) => ({
+const createData = (
   id,
   name,
   date,
   distance,
-  duration,
-  pace,
+  hours,
+  minutes,
+  seconds,
+  paceMinutes,
+  paceSeconds
+) => ({
+  id,
+  name,
+  date,
+  distance,
+  hours,
+  minutes,
+  seconds,
+  paceMinutes,
+  paceSeconds,
   isEditMode: false,
 });
 
@@ -207,15 +220,14 @@ const CustomTableCell = ({ run, name, onChange }) => {
     <TableCell align="right" className={classes.tableCell}>
       {isEditMode ? (
         <Input
-          value={run[name]}
+          disabled={name !== "name"}
+          value={getInfoDisplay(run, name)}
           name={name}
           onChange={(e) => onChange(e, run)}
           className={classes.input}
         />
-      ) : name === "pace" ? (
-        getPaceDisplay(run["distance"], run["duration"])
       ) : (
-        getInfoDisplay(run[name], name)
+        getInfoDisplay(run, name)
       )}
     </TableCell>
   );
@@ -363,8 +375,11 @@ export default function DisplayAllRuns() {
               run.name,
               run.date,
               run.distance,
-              run.duration,
-              run.pace
+              run.hours,
+              run.minutes,
+              run.seconds,
+              run.paceMinutes,
+              run.paceSeconds
             ),
           ])
         );

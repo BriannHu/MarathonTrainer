@@ -1,15 +1,15 @@
-export function getInfoDisplay(string, type) {
-  switch (type) {
+export function getInfoDisplay(run, name) {
+  switch (name) {
     case "date":
-      return getDateDisplay(string.substring(0, 10));
+      return getDateDisplay(run[name].substring(0, 10));
     case "distance":
-      return getDistanceDisplay(string);
+      return getDistanceDisplay(run[name]);
     case "duration":
-      return getDurationDisplay(string);
+      return getDurationDisplay(run["hours"], run["minutes"], run["seconds"]);
     case "pace":
-      return getPaceDisplay();
+      return getPaceDisplay(run["paceMinutes"], run["paceSeconds"]);
     default:
-      return string;
+      return run[name];
   }
 }
 
@@ -35,32 +35,17 @@ function getDateDisplay(date) {
 // rounds input distance (m) to nearest 2 decimal place KM
 // TODO: switch between km and miles
 function getDistanceDisplay(distance) {
-  const totalKm = (parseInt(distance) / 1000).toFixed(2);
-  return `${totalKm} km`;
+  return `${distance} km`;
 }
 
 // rounds input duration (s) to nearest 2 decimal place KM
-function getDurationDisplay(duration) {
-  const hours = Math.floor(duration / 3600);
-  const rem1 = duration % 3600;
-  const mins = Math.floor(rem1 / 60);
-  var secs = rem1 % 60;
-  if (secs < 10) secs = `0${secs}`;
+export function getDurationDisplay(hours, minutes, seconds) {
+  const mins = (minutes < 10 ? "0" : "") + minutes;
+  const secs = (seconds < 10 ? "0" : "") + seconds;
   return hours > 0 ? `${hours}:${mins}:${secs}` : `${mins}:${secs}`;
 }
 
 // input distance (m) and input duration (s)
-export function getPaceDisplay(distance, duration) {
-  var mins = Math.floor(duration / 60);
-  var secs = duration % 60;
-  if (secs / 60 === 0) secs = 60;
-  if (mins === 0) mins = 1;
-  const time = mins * (secs / 60);
-  const km = (parseInt(distance) / 1000).toFixed(2);
-  const res = time / km;
-
-  const pace_mins = res.toString().split(".")[0];
-  const pace_secs_perc = res - pace_mins;
-  const pace_secs = Math.floor(pace_secs_perc * 60);
-  return `${pace_mins}'${pace_secs}"`;
+export function getPaceDisplay(paceMinutes, paceSeconds) {
+  return `${paceMinutes || 0}'${paceSeconds || 0}"`;
 }

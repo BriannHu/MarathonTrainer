@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { makeStyles } from "@material-ui/core/styles";
 
@@ -61,10 +61,15 @@ export default function QuickAdd() {
   const [name, setName] = useState("");
   const [date, setDate] = useState(new Date());
   const [distance, setDistance] = useState(0);
-  const [pace, setPace] = useState(0);
   const [hours, setHours] = useState(0);
   const [minutes, setMinutes] = useState(0);
   const [seconds, setSeconds] = useState(0);
+  const [paceMinutes, setPaceMinutes] = useState(0);
+  const [paceSeconds, setPaceSeconds] = useState(0);
+  const [distError, setDistError] = useState(false);
+  const [hourError, setHourError] = useState(false);
+  const [minsError, setMinsError] = useState(false);
+  const [secsError, setSecsError] = useState(false);
 
   function getFormattedDate() {
     const today = new Date();
@@ -78,14 +83,68 @@ export default function QuickAdd() {
     return formattedDate;
   }
 
+  useEffect(() => {
+    var hrs = hours;
+    var mins = minutes;
+    var secs = seconds;
+    mins = parseInt(mins) + parseInt(hrs * 60);
+    var pace_mins = Math.trunc(mins / distance);
+    var frac_secs = ((mins / distance) % 1) + secs / 60 / distance;
+    var pace_secs = Math.round(frac_secs * 60);
+    setPaceMinutes(pace_mins);
+    setPaceSeconds(pace_secs);
+  }, [distance, hours, minutes, seconds]);
+
   const onSubmit = (e) => {
     e.preventDefault();
-    const duration = hours * 360 + minutes * 60 + seconds;
-    const run = { name, date, distance, duration, pace };
+    if (distance === 0 || (hours === 0 && minutes === 0 && seconds === 0)) {
+      setDistError(distance === 0);
+      setHourError(hours === 0 && minutes === 0 && seconds === 0);
+      setMinsError(hours === 0 && minutes === 0 && seconds === 0);
+      setSecsError(hours === 0 && minutes === 0 && seconds === 0);
+      alert("Please fill out the required entries in Quick Add.");
+      return;
+    }
+
+    const run = {
+      name,
+      date,
+      distance,
+      hours,
+      minutes,
+      seconds,
+      paceMinutes,
+      paceSeconds,
+    };
     console.log(run);
     axios
       .post("http://localhost:5000/runs/add", run)
       .then((res) => console.log(res.data));
+    alert("Run added successfully!");
+  };
+
+  const onDistanceChange = (e) => {
+    if (e.target.value <= 0) {
+      setDistError(true);
+      return;
+    }
+    setDistError(false);
+    setDistance(e.target.value);
+  };
+
+  const onHourChange = (e) => {
+    setHourError(false);
+    setHours(e.target.value);
+  };
+
+  const onMinsChange = (e) => {
+    setMinsError(false);
+    setMinutes(e.target.value);
+  };
+
+  const onSecsChange = (e) => {
+    setSecsError(false);
+    setSeconds(e.target.value);
   };
 
   return (
@@ -118,7 +177,7 @@ export default function QuickAdd() {
             <Grid item xs={12}>
               <TextField
                 className={classes.input}
-                label="Name"
+                label="Name (optional)"
                 variant="outlined"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
@@ -146,7 +205,9 @@ export default function QuickAdd() {
                 label="Distance"
                 variant="outlined"
                 value={distance}
-                onChange={(e) => setDistance(e.target.value)}
+                type="number"
+                error={distError || distance < 0}
+                onChange={(e) => onDistanceChange(e)}
                 fullWidth={true}
               />
             </Grid>
@@ -168,7 +229,8 @@ export default function QuickAdd() {
                   "aria-label": "hours",
                 }}
                 value={hours}
-                onChange={(e) => setHours(e.target.value)}
+                error={hourError || hours < 0}
+                onChange={(e) => onHourChange(e)}
                 type="number"
                 fullWidth={true}
               />
@@ -185,7 +247,8 @@ export default function QuickAdd() {
                   max: 59,
                 }}
                 value={minutes}
-                onChange={(e) => setMinutes(e.target.value)}
+                error={minsError || minutes < 0 || minutes > 59}
+                onChange={(e) => onMinsChange(e)}
                 type="number"
                 fullWidth={true}
               />
@@ -202,7 +265,8 @@ export default function QuickAdd() {
                   max: 59,
                 }}
                 value={seconds}
-                onChange={(e) => setSeconds(e.target.value)}
+                error={secsError || seconds < 0 || seconds > 59}
+                onChange={(e) => onSecsChange(e)}
                 type="number"
                 fullWidth={true}
               />
@@ -217,8 +281,9 @@ export default function QuickAdd() {
                   style: { fontWeight: 600, textAlign: "center" },
                 }}
                 fullWidth={true}
-                value={pace}
-                onChange={(e) => setPace(e.target.value)}
+                value={`${paceMinutes || 0}'${
+                  paceSeconds < 10 ? "0" + paceSeconds : paceSeconds || 0
+                }"`}
               />
             </Grid>
           </Grid>

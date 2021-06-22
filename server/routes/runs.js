@@ -11,15 +11,21 @@ router.route("/add").post((req, res) => {
   const name = req.body.name;
   const date = Date.parse(req.body.date);
   const distance = Number(req.body.distance);
-  const duration = Number(req.body.duration);
-  const pace = Number(req.body.pace);
+  const hours = Number(req.body.hours);
+  const minutes = Number(req.body.minutes);
+  const seconds = Number(req.body.seconds);
+  const paceMinutes = Number(req.body.paceMinutes);
+  const paceSeconds = Number(req.body.paceSeconds);
 
   const newRun = new Run({
     name,
     date,
     distance,
-    duration,
-    pace,
+    hours,
+    minutes,
+    seconds,
+    paceMinutes,
+    paceSeconds,
   });
 
   newRun
@@ -46,8 +52,11 @@ router.route("/edit/:id").post((req, res) => {
       run.name = req.body.name;
       run.date = Date.parse(req.body.date);
       run.distance = Number(req.body.distance);
-      run.duration = Number(req.body.duration);
-      run.pace = Number(req.body.pace);
+      run.hours = Number(req.body.hours);
+      run.minutes = Number(req.body.minutes);
+      run.seconds = Number(req.body.seconds);
+      run.paceMinutes = Number(req.body.paceMinutes);
+      run.paceSeconds = Number(req.body.paceSeconds);
       run
         .save()
         .then(() => res.json("Run updated!"))

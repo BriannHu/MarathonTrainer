@@ -6,25 +6,45 @@ const runSchema = new Schema(
   {
     name: {
       type: String,
-      required: true,
+      required: false,
       trim: true,
-      minLength: 2,
     },
     date: {
       type: Date,
       required: true,
     },
     distance: {
+      // stored as km
       type: Number,
       required: true,
     },
-    duration: {
+    hours: {
       type: Number,
       required: true,
+      min: 0,
     },
-    pace: {
+    minutes: {
       type: Number,
-      required: false,
+      required: true,
+      min: 0,
+      max: 59,
+    },
+    seconds: {
+      type: Number,
+      required: true,
+      min: 0,
+      max: 59,
+    },
+    paceMinutes: {
+      type: Number,
+      required: true,
+      min: 0,
+    },
+    paceSeconds: {
+      type: Number,
+      required: true,
+      min: 0,
+      max: 59,
     },
   },
   { timestamps: true }
