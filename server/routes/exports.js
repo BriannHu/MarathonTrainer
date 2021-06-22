@@ -5,7 +5,16 @@ const fs = require("fs");
 const moment = require("moment");
 const json2csv = require("json2csv").parse;
 const path = require("path");
-const fields = ["name", "date", "distance", "duration", "pace"];
+const fields = [
+  "name",
+  "date",
+  "distance",
+  "hours",
+  "minutes",
+  "seconds",
+  "paceMinutes",
+  "paceSeconds",
+];
 const Run = require("../models/run_model");
 
 router.get("/", function (req, res) {
