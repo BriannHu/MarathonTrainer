@@ -215,7 +215,6 @@ export default function QuickAdd(props) {
           <Grid className={classes.gridMultInner} container spacing={2}>
             <Grid item xs={9}>
               <TextField
-                label="Distance"
                 variant="outlined"
                 value={distance}
                 type="number"
@@ -296,7 +295,7 @@ export default function QuickAdd(props) {
                 }}
                 fullWidth={true}
                 value={`${paceMinutes || 0}'${
-                  paceSeconds < 10 ? "0" + paceSeconds : paceSeconds || 0
+                  paceSeconds < 10 ? "0" + paceSeconds : paceSeconds || "00"
                 }"`}
               />
             </Grid>

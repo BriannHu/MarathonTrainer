@@ -39,7 +39,7 @@ export default function Dashboard() {
     paceMinutes,
     paceSeconds
   ) => ({
-    // pre-emptively set mongodb ID
+    // pre-emptively set MongoDB ID
     // can add multiple runs and select individually
     // otherwise have to refresh page to load runs from MongoDB for _id's
     _id: id,
@@ -114,7 +114,7 @@ export default function Dashboard() {
   return (
     <Grid container spacing={3}>
       <Grid item xs={12} sm={6} lg={3}>
-        <DistanceCard />
+        <DistanceCard allRuns={runs} />
         {/* <Paper className={classes.paper}>Card 1</Paper> */}
       </Grid>
       <Grid item xs={12} sm={6} lg={3}>

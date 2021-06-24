@@ -42,7 +42,7 @@ function getDateDisplay(input) {
 // rounds input distance (m) to nearest 2 decimal place KM
 // TODO: switch between km and miles
 function getDistanceDisplay(distance) {
-  return `${distance} km`;
+  return `${parseFloat(distance).toFixed(2)} km`;
 }
 
 // rounds input duration (s) to nearest 2 decimal place KM
