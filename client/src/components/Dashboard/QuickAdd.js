@@ -13,6 +13,7 @@ import {
   TextField,
   Typography,
 } from "@material-ui/core";
+import { colors } from "@material-ui/core";
 import AddIcon from "@material-ui/icons/AddBoxOutlined";
 
 const useStyles = makeStyles((theme) => ({
@@ -23,6 +24,18 @@ const useStyles = makeStyles((theme) => ({
   cardContent: {
     "&:last-child": {
       paddingBottom: 20,
+    },
+  },
+  paceOutline: {
+    "& .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline": {
+      borderColor: colors.indigo[500],
+      borderWidth: "1px",
+    },
+    "& .MuiOutlinedInput-input": {
+      color: colors.indigo[500],
+    },
+    "& .MuiInputLabel-outlined": {
+      color: colors.indigo[500],
     },
   },
   distanceText: {
@@ -176,7 +189,7 @@ export default function QuickAdd(props) {
           <Grid className={classes.gridInner} container spacing={3}>
             <Grid item xs={12}>
               <TextField
-                className={classes.input}
+                className={classes.normalOutline}
                 label="Name (optional)"
                 variant="outlined"
                 value={name}
@@ -188,7 +201,7 @@ export default function QuickAdd(props) {
           <Grid className={classes.gridInner} container spacing={3}>
             <Grid item xs={12}>
               <TextField
-                className={classes.input}
+                className={classes.normalOutline}
                 variant="outlined"
                 type="datetime-local"
                 defaultValue={getFormattedDate()}
@@ -275,7 +288,8 @@ export default function QuickAdd(props) {
           <Grid className={classes.gridInner} container spacing={3}>
             <Grid item xs={12}>
               <TextField
-                variant="filled"
+                className={classes.paceOutline}
+                variant="outlined"
                 inputProps={{
                   readOnly: true,
                   style: { fontWeight: 600, textAlign: "center" },
