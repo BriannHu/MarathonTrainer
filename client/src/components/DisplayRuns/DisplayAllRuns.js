@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import PropTypes from "prop-types";
 
 import { lighten, makeStyles } from "@material-ui/core/styles";
@@ -189,29 +189,6 @@ EnhancedTableHead.propTypes = {
 
 //------------------- FOR EDITABLE FUNCTIONALITY -------------------
 
-const createData = (
-  id,
-  name,
-  date,
-  distance,
-  hours,
-  minutes,
-  seconds,
-  paceMinutes,
-  paceSeconds
-) => ({
-  id,
-  name,
-  date,
-  distance,
-  hours,
-  minutes,
-  seconds,
-  paceMinutes,
-  paceSeconds,
-  isEditMode: false,
-});
-
 const CustomTableCell = ({ run, name, onChange }) => {
   const classes = useStyles();
   const { isEditMode } = run;
@@ -282,8 +259,7 @@ function exportRuns() {
 
 const EnhancedTableToolbar = (props) => {
   const classes = useToolbarStyles();
-  const { numSelected, deleteRun, selected, setSelected, setRuns, runs } =
-    props;
+  const { numSelected, handleRunDelete, selected, setSelected } = props;
   return (
     <Toolbar className={classes.root}>
       <Typography
@@ -314,8 +290,7 @@ const EnhancedTableToolbar = (props) => {
             className={classes.button}
             startIcon={<DeleteIcon />}
             onClick={() => {
-              selected.map((id) => deleteRun(id));
-              setRuns(runs.filter((run) => !selected.includes(run.id)));
+              handleRunDelete(selected);
               setSelected([]);
             }}
           >
@@ -344,7 +319,7 @@ EnhancedTableToolbar.propTypes = {
 export default function DisplayAllRuns(props) {
   const classes = useStyles();
   // stores runs to be mapped to rows, pulled from db
-  const [runs, setRuns] = useState([]);
+  // const [runs, setRuns] = useState([]);
 
   // stores history of runs before change
   // triggers when edit button of run is clicked
@@ -352,7 +327,7 @@ export default function DisplayAllRuns(props) {
 
   // sets ordering of table
   // default is ascending by date
-  const [order, setOrder] = useState("asc");
+  const [order, setOrder] = useState("desc");
   const [orderBy, setOrderBy] = useState("date");
 
   // sets current selected row(s)
@@ -361,33 +336,6 @@ export default function DisplayAllRuns(props) {
   // sets pagination options
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
-
-  useEffect(() => {
-    setRuns([]); // prevents more entries from being added each render
-    axios
-      .get("http://localhost:5000/runs/")
-      .then((response) => {
-        response.data.map((run) =>
-          setRuns((old) => [
-            ...old,
-            createData(
-              run._id,
-              run.name,
-              run.date,
-              run.distance,
-              run.hours,
-              run.minutes,
-              run.seconds,
-              run.paceMinutes,
-              run.paceSeconds
-            ),
-          ])
-        );
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  }, [props.allRuns]);
 
   const onToggleEditMode = (run, id) => {
     if (!previous[id]) {
@@ -398,38 +346,19 @@ export default function DisplayAllRuns(props) {
         return state;
       });
     }
-    setRuns((state) => {
-      return runs.map((run) => {
-        axios
-          .post("http://localhost:5000/runs/edit/" + run.id, run)
-          .then((res) => console.log(res.data));
-        if (run.id === id) {
-          return { ...run, isEditMode: !run.isEditMode };
-        }
-        return run;
-      });
-    });
+    props.handleRunEdit(run, id);
   };
 
   const onChange = (e, run) => {
-    if (!previous[run.id]) {
-      setPrevious((state) => ({ ...state, [run.id]: run }));
+    if (!previous[run._id]) {
+      setPrevious((state) => ({ ...state, [run._id]: run }));
     }
-    const value = e.target.value;
-    const name = e.target.name;
-    const { id } = run;
-    const newRuns = runs.map((run) => {
-      if (run.id === id) {
-        return { ...run, [name]: value };
-      }
-      return run;
-    });
-    setRuns(newRuns);
+    props.handleRunEditChange(e, run);
   };
 
   const onRevert = (id) => {
-    const newRuns = runs.map((run) => {
-      if (run.id === id) {
+    const newRuns = props.allRuns.map((run) => {
+      if (run._id === id) {
         return previous[id]
           ? { ...previous[id], isEditMode: !run.isEditMode }
           : { ...run, isEditMode: !run.isEditMode };
@@ -440,13 +369,7 @@ export default function DisplayAllRuns(props) {
       delete state[id];
       return state;
     });
-    setRuns(newRuns);
-  };
-
-  const deleteRun = (id) => {
-    axios
-      .delete("http://localhost:5000/runs/" + id)
-      .then((res) => console.log(res.data));
+    props.handleRunRevert(newRuns);
   };
 
   const handleRequestSort = (e, property) => {
@@ -457,7 +380,7 @@ export default function DisplayAllRuns(props) {
 
   const handleSelectAllClick = (e) => {
     if (e.target.checked) {
-      const newSelecteds = runs.map((n) => n.id);
+      const newSelecteds = props.allRuns.map((n) => n._id);
       setSelected(newSelecteds);
       return;
     }
@@ -495,16 +418,18 @@ export default function DisplayAllRuns(props) {
 
   const isSelected = (name) => selected.indexOf(name) !== -1;
   const emptyRows =
-    rowsPerPage - Math.min(rowsPerPage, runs.length - page * rowsPerPage);
+    rowsPerPage -
+    Math.min(rowsPerPage, props.allRuns.length - page * rowsPerPage);
+
   return (
     <Paper className={classes.paper} elevation={2}>
       <EnhancedTableToolbar
         numSelected={selected.length}
-        deleteRun={deleteRun}
         selected={selected}
         setSelected={setSelected}
-        setRuns={setRuns}
-        runs={runs}
+        handleRunDelete={props.handleRunDelete}
+        // setRuns={setRuns}
+        // runs={runs}
       />
       <TableContainer>
         <Table className={classes.table} aria-label="data-table" size="small">
@@ -515,13 +440,13 @@ export default function DisplayAllRuns(props) {
             orderBy={orderBy}
             onSelectAllClick={handleSelectAllClick}
             onRequestSort={handleRequestSort}
-            rowCount={runs.length}
+            rowCount={props.allRuns.length}
           />
           <TableBody>
-            {stableSort(runs, getComparator(order, orderBy))
+            {stableSort(props.allRuns, getComparator(order, orderBy))
               .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
               .map((run, index) => {
-                const isItemSelected = isSelected(run.id);
+                const isItemSelected = isSelected(run._id);
                 const labelId = `enhanced-table-checkbox-${index}`;
 
                 return (
@@ -535,7 +460,7 @@ export default function DisplayAllRuns(props) {
                         color="primary"
                         checked={isItemSelected}
                         inputProps={{ "aria-labelledby": labelId }}
-                        onClick={(e) => handleSelectClick(e, run.id)}
+                        onClick={(e) => handleSelectClick(e, run._id)}
                       />
                     </TableCell>
                     <CustomTableCell {...{ run, name: "name", onChange }} />
@@ -548,13 +473,13 @@ export default function DisplayAllRuns(props) {
                         <>
                           <IconButton
                             aria-label="done"
-                            onClick={() => onToggleEditMode(run, run.id)}
+                            onClick={() => onToggleEditMode(run, run._id)}
                           >
                             <DoneIcon />
                           </IconButton>
                           <IconButton
                             aria-label="revert"
-                            onClick={() => onRevert(run.id)}
+                            onClick={() => onRevert(run._id)}
                           >
                             <RevertIcon />
                           </IconButton>
@@ -572,7 +497,7 @@ export default function DisplayAllRuns(props) {
                           </IconButton>
                           <IconButton
                             aria-label="edit"
-                            onClick={() => onToggleEditMode(run, run.id)}
+                            onClick={() => onToggleEditMode(run, run._id)}
                           >
                             <i
                               className="far fa-edit"
@@ -595,7 +520,7 @@ export default function DisplayAllRuns(props) {
       </TableContainer>
       <TablePagination
         component="div"
-        count={runs.length}
+        count={props.allRuns.length}
         rowsPerPage={rowsPerPage}
         rowsPerPageOptions={[5]}
         page={page}

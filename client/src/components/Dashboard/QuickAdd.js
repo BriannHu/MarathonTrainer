@@ -59,7 +59,7 @@ const useStyles = makeStyles((theme) => ({
 export default function QuickAdd(props) {
   const classes = useStyles();
   const [name, setName] = useState("");
-  const [date, setDate] = useState(new Date());
+  const [date, setDate] = useState(new Date().toISOString());
   const [distance, setDistance] = useState(0);
   const [hours, setHours] = useState(0);
   const [minutes, setMinutes] = useState(0);
@@ -70,6 +70,7 @@ export default function QuickAdd(props) {
   const [hourError, setHourError] = useState(false);
   const [minsError, setMinsError] = useState(false);
   const [secsError, setSecsError] = useState(false);
+  const [id, setId] = useState("");
 
   function getFormattedDate() {
     const today = new Date();
@@ -105,7 +106,6 @@ export default function QuickAdd(props) {
       alert("Please fill out the required entries in Quick Add.");
       return;
     }
-
     const run = {
       name,
       date,
@@ -118,9 +118,9 @@ export default function QuickAdd(props) {
     };
     axios
       .post("http://localhost:5000/runs/add", run)
-      .then((res) => console.log(res.data));
+      .then((res) => setId(res.data));
 
-    props.handleRunChange(run);
+    props.handleRunChange(run, id);
   };
 
   const onDistanceChange = (e) => {
@@ -193,7 +193,7 @@ export default function QuickAdd(props) {
                 type="datetime-local"
                 defaultValue={getFormattedDate()}
                 onChange={(e) => {
-                  setDate(e.target.value);
+                  setDate(e.target.value.toISOString());
                 }}
                 fullWidth={true}
               />

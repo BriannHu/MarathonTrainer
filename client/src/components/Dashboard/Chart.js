@@ -89,6 +89,7 @@ export default function Chart() {
   }
 
   const options = {
+    animation: false,
     gridLines: {
       display: false,
     },

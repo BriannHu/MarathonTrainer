@@ -1,7 +1,7 @@
 export function getInfoDisplay(run, name) {
   switch (name) {
     case "date":
-      return getDateDisplay(run[name].substring(0, 10));
+      return getDateDisplay(run[name]);
     case "distance":
       return getDistanceDisplay(run[name]);
     case "duration":
@@ -13,7 +13,14 @@ export function getInfoDisplay(run, name) {
   }
 }
 
-function getDateDisplay(date) {
+function getDateDisplay(input) {
+  // if run has just been added in Quick Add and not retrieved from database
+  // format is Object(Tue Jun 22 2021 22:56:30 GMT-0400 (Eastern Daylight Time))
+  if (typeof input === "object") {
+    const date = input.toString(); // first convert to string
+    return date.toUpperCase().substring(4, 15);
+  }
+  const date = input.substring(0, 10);
   const months = {
     1: "JAN",
     2: "FEB",
@@ -47,5 +54,7 @@ export function getDurationDisplay(hours, minutes, seconds) {
 
 // input distance (m) and input duration (s)
 export function getPaceDisplay(paceMinutes, paceSeconds) {
-  return `${paceMinutes || 0}'${paceSeconds || 0}"`;
+  return `${paceMinutes || 0}'${
+    paceSeconds < 10 ? "0" + paceSeconds : paceSeconds || 0
+  }"`;
 }

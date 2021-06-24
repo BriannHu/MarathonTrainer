@@ -28,10 +28,12 @@ router.route("/add").post((req, res) => {
     paceSeconds,
   });
 
-  newRun
-    .save()
-    .then(() => res.json("Run added!"))
-    .catch((err) => res.status(400).json("Error: " + err));
+  newRun.save(function (err, run) {
+    return run
+      .save()
+      .then(() => res.json(run._id))
+      .catch((err) => res.status(400).json("Error: " + err));
+  });
 });
 
 router.route("/:id").get((req, res) => {

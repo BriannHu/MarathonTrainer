@@ -25,12 +25,90 @@ export default function Dashboard() {
       .catch((error) => {
         console.log(error);
       });
-    console.log(`from dashboard: ${runs}`);
     // eslint-disable-next-line
   }, []);
 
-  const handleRunChange = (newRun) => {
-    setRuns((oldRuns) => [...oldRuns, newRun]);
+  const createData = (
+    id,
+    name,
+    date,
+    distance,
+    hours,
+    minutes,
+    seconds,
+    paceMinutes,
+    paceSeconds
+  ) => ({
+    // pre-emptively set mongodb ID
+    // can add multiple runs and select individually
+    // otherwise have to refresh page to load runs from MongoDB for _id's
+    _id: id,
+    name,
+    date,
+    distance,
+    hours,
+    minutes,
+    seconds,
+    paceMinutes,
+    paceSeconds,
+    isEditMode: false,
+  });
+
+  const handleRunChange = (newRun, id) => {
+    setRuns((oldRuns) => [
+      ...oldRuns,
+      createData(
+        id,
+        newRun.name,
+        newRun.date,
+        newRun.distance,
+        newRun.hours,
+        newRun.minutes,
+        newRun.seconds,
+        newRun.paceMinutes,
+        newRun.paceSeconds
+      ),
+    ]);
+  };
+
+  const handleRunDelete = (selected) => {
+    selected.forEach((id) => {
+      axios
+        .delete("http://localhost:5000/runs/" + id)
+        .then((res) => console.log(res.data));
+    });
+    const newRuns = runs.filter((run) => selected.indexOf(run._id) < 0); // can't be found in array
+    setRuns(newRuns);
+  };
+
+  const handleRunEdit = (run, id) => {
+    setRuns((state) => {
+      return runs.map((run) => {
+        axios
+          .post("http://localhost:5000/runs/edit/" + run._id, run)
+          .then((res) => console.log(res.data));
+        if (run._id === id) {
+          return { ...run, isEditMode: !run.isEditMode };
+        }
+        return run;
+      });
+    });
+  };
+
+  const handleRunEditChange = (e, input_run) => {
+    const value = e.target.value;
+    const name = e.target.name;
+    const newRuns = runs.map((run) => {
+      if (run._id === input_run._id) {
+        return { ...run, [name]: value };
+      }
+      return run;
+    });
+    setRuns(newRuns);
+  };
+
+  const handleRunRevert = (newRuns) => {
+    setRuns(newRuns);
   };
 
   return (
@@ -64,7 +142,13 @@ export default function Dashboard() {
         {/* <Paper className={classes.paper}>Card 7</Paper> */}
       </Grid>
       <Grid item xs={12} lg={8}>
-        <DisplayAllRuns allRuns={runs} />
+        <DisplayAllRuns
+          allRuns={runs}
+          handleRunDelete={handleRunDelete}
+          handleRunEdit={handleRunEdit}
+          handleRunEditChange={handleRunEditChange}
+          handleRunRevert={handleRunRevert}
+        />
         {/* <Paper className={classes.paper}>Card 7</Paper> */}
       </Grid>
     </Grid>
