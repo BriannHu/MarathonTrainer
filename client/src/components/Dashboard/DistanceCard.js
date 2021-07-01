@@ -11,6 +11,7 @@ import ArrowUpwardIcon from "@material-ui/icons/ArrowUpward";
 import ArrowDownwardIcon from "@material-ui/icons/ArrowDownward";
 import DistanceIcon from "@material-ui/icons/RoomOutlined";
 import Typography from "@material-ui/core/Typography";
+import ButtonBase from "@material-ui/core/ButtonBase";
 
 import {
   getCumulativeDistance,
@@ -30,6 +31,9 @@ const useStyles = makeStyles((theme) => ({
   arrowNegative: {
     color: red[700],
   },
+  buttonBase: {
+    width: "100%",
+  },
   positive: {
     color: green[700],
     marginRight: theme.spacing(1),
@@ -40,17 +44,11 @@ const useStyles = makeStyles((theme) => ({
   },
   avatar: {
     backgroundColor: deepOrange[500],
-    cursor: "pointer",
   },
   box: {
     paddingTop: theme.spacing(1),
     display: "flex",
     alignItems: "center",
-  },
-  button: {
-    "& .MuiIconButton-colorPrimary": {
-      backgroundColor: deepOrange[500],
-    },
   },
   cardContent: {
     "&:last-child": {
@@ -58,7 +56,7 @@ const useStyles = makeStyles((theme) => ({
     },
   },
   root: {
-    minWidth: 275,
+    minWidth: "100%",
   },
   bullet: {
     display: "inline-block",
@@ -75,6 +73,7 @@ const useStyles = makeStyles((theme) => ({
     fontSize: 14,
     fontWeight: 700,
     textTransform: "uppercase",
+    textAlign: "left",
   },
 }));
 
@@ -150,50 +149,51 @@ export default function DistanceCard(props) {
   }, [props.allRuns]);
 
   return (
-    <Card className={classes.root}>
-      <CardContent className={classes.cardContent}>
-        <Grid className={classes.gridOuter} container spacing={3}>
-          <Grid item>
-            <Typography
-              className={classes.title}
-              color="textSecondary"
-              gutterBottom
-            >
-              Distance
-            </Typography>
-            <Typography
-              className={classes.number}
-              color="textPrimary"
-              variant="h4"
-            >
-              {parseFloat(currValue).toFixed(2)} km
-            </Typography>
+    <ButtonBase className={classes.buttonBase} onClick={handleDisplayClick}>
+      <Card className={classes.root}>
+        <CardContent className={classes.cardContent}>
+          <Grid className={classes.gridOuter} container spacing={3}>
+            <Grid item className={classes.gridItem}>
+              <Typography
+                className={classes.title}
+                color="textSecondary"
+                gutterBottom
+              >
+                Distance
+              </Typography>
+              <Typography
+                className={classes.number}
+                color="textPrimary"
+                variant="h4"
+              >
+                {parseFloat(currValue).toFixed(2)} km
+              </Typography>
+            </Grid>
+            <Grid item>
+              <Avatar className={classes.avatar}>
+                <DistanceIcon />
+              </Avatar>
+            </Grid>
           </Grid>
+          <Box className={classes.box}>
+            {stateDiff >= 0 ? (
+              <ArrowUpwardIcon className={classes.arrowPositive} />
+            ) : (
+              <ArrowDownwardIcon className={classes.arrowNegative} />
+            )}
 
-          <Grid item>
-            <Avatar className={classes.avatar} onClick={handleDisplayClick}>
-              <DistanceIcon />
-            </Avatar>
-          </Grid>
-        </Grid>
-        <Box className={classes.box}>
-          {stateDiff >= 0 ? (
-            <ArrowUpwardIcon className={classes.arrowPositive} />
-          ) : (
-            <ArrowDownwardIcon className={classes.arrowNegative} />
-          )}
-
-          <Typography
-            className={stateDiff >= 0 ? classes.positive : classes.negative}
-            variant="body2"
-          >
-            {percentDiff}%
-          </Typography>
-          <Typography color="textSecondary" variant="caption">
-            Since last {display} ({parseFloat(prevValue).toFixed(2)} km)
-          </Typography>
-        </Box>
-      </CardContent>
-    </Card>
+            <Typography
+              className={stateDiff >= 0 ? classes.positive : classes.negative}
+              variant="body2"
+            >
+              {percentDiff}%
+            </Typography>
+            <Typography color="textSecondary" variant="caption">
+              Since last {display} ({parseFloat(prevValue).toFixed(2)} km)
+            </Typography>
+          </Box>
+        </CardContent>
+      </Card>
+    </ButtonBase>
   );
 }

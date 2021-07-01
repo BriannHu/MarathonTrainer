@@ -1,22 +1,48 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Avatar from "@material-ui/core/Avatar";
 import Box from "@material-ui/core/Box";
 import Card from "@material-ui/core/Card";
 import CardContent from "@material-ui/core/CardContent";
 import Grid from "@material-ui/core/Grid";
-import { green, purple } from "@material-ui/core/colors";
+import { green, purple, red } from "@material-ui/core/colors";
 
 import ArrowUpwardIcon from "@material-ui/icons/ArrowUpward";
+import ArrowDownwardIcon from "@material-ui/icons/ArrowDownward";
 import PaceIcon from "@material-ui/icons/SpeedOutlined";
 import Typography from "@material-ui/core/Typography";
+import ButtonBase from "@material-ui/core/ButtonBase";
+
+import {
+  getCumulativeDistance,
+  getCumulativeDuration,
+  getTotalRunPace,
+  getRunDuration,
+  getRunPace,
+  getLastRun,
+  getLastWeekRuns,
+  getLastMonthRuns,
+  getSecondLastRun,
+  getSecondLastWeekRuns,
+  getSecondLastMonthRuns,
+  getSeconds,
+  getSecondsFromPace,
+  getPercentageDiff,
+} from "./CardUtilities";
 
 const useStyles = makeStyles((theme) => ({
-  arrow: {
+  arrowPositive: {
     color: green[700],
   },
-  arrowText: {
+  arrowNegative: {
+    color: red[700],
+  },
+  positive: {
     color: green[700],
+    marginRight: theme.spacing(1),
+  },
+  negative: {
+    color: red[700],
     marginRight: theme.spacing(1),
   },
   avatar: {
@@ -27,13 +53,16 @@ const useStyles = makeStyles((theme) => ({
     display: "flex",
     alignItems: "center",
   },
+  buttonBase: {
+    width: "100%",
+  },
   cardContent: {
     "&:last-child": {
       paddingBottom: 16,
     },
   },
   root: {
-    minWidth: 275,
+    minWidth: "100%",
   },
   gridOuter: {
     justifyContent: "space-between",
@@ -44,6 +73,7 @@ const useStyles = makeStyles((theme) => ({
   title: {
     fontSize: 14,
     fontWeight: 700,
+    textAlign: "left",
     textTransform: "uppercase",
   },
   pos: {
@@ -51,46 +81,190 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function PaceCard() {
+export default function PaceCard(props) {
   const classes = useStyles();
+  const [display, setDisplay] = useState("run");
+  const [currValue, setCurrValue] = useState(0);
+  const [prevValue, setPrevValue] = useState(0);
+  const [percentDiff, setPercentDiff] = useState(0);
+  // 1 means current value > last value, -1 means last value > current value
+  const [stateDiff, setStateDiff] = useState(0);
+
+  const handleDisplayClick = () => {
+    switch (display) {
+      case "run":
+        setDisplay("week");
+        const lastWeekRuns = getLastWeekRuns(props.allRuns);
+        const lastWeekDistance = getCumulativeDistance(lastWeekRuns);
+        const lastWeekDuration = getCumulativeDuration(lastWeekRuns);
+        const lastWeekPace = getTotalRunPace(
+          lastWeekDistance,
+          lastWeekDuration
+        );
+
+        const secondLastWeekRuns = getSecondLastWeekRuns(props.allRuns);
+        const secondLastWeekDistance =
+          getCumulativeDistance(secondLastWeekRuns);
+        const secondLastWeekDuration =
+          getCumulativeDuration(secondLastWeekRuns);
+        const secondLastWeekPace = getTotalRunPace(
+          secondLastWeekDistance,
+          secondLastWeekDuration
+        );
+
+        setCurrValue(lastWeekPace);
+        setPrevValue(secondLastWeekPace);
+
+        setPercentDiff(
+          Math.round(
+            getPercentageDiff(
+              getSecondsFromPace(lastWeekPace),
+              getSecondsFromPace(secondLastWeekPace)
+            )
+          )
+        );
+        setStateDiff(
+          getSecondsFromPace(lastWeekPace) >=
+            getSecondsFromPace(secondLastWeekPace)
+            ? 1
+            : -1
+        );
+        break;
+      case "week":
+        setDisplay("month");
+        const lastMonthRuns = getLastMonthRuns(props.allRuns);
+        const lastMonthDistance = getCumulativeDistance(lastMonthRuns);
+        const lastMonthDuration = getCumulativeDuration(lastMonthRuns);
+        const lastMonthPace = getTotalRunPace(
+          lastMonthDistance,
+          lastMonthDuration
+        );
+
+        const secondLastMonthRuns = getSecondLastMonthRuns(props.allRuns);
+        const secondLastMonthDistance =
+          getCumulativeDistance(secondLastMonthRuns);
+        const secondLastMonthDuration =
+          getCumulativeDuration(secondLastMonthRuns);
+        const secondLastMonthPace = getTotalRunPace(
+          secondLastMonthDistance,
+          secondLastMonthDuration
+        );
+
+        setCurrValue(lastMonthPace);
+        setPrevValue(secondLastMonthPace);
+
+        setPercentDiff(
+          Math.round(
+            getPercentageDiff(
+              getSecondsFromPace(lastMonthPace),
+              getSecondsFromPace(secondLastMonthPace)
+            )
+          )
+        );
+        setStateDiff(
+          getSecondsFromPace(lastMonthPace) >=
+            getSecondsFromPace(secondLastMonthPace)
+            ? 1
+            : -1
+        );
+        break;
+      default:
+        setDisplay("run");
+        const lastRun = getLastRun(props.allRuns);
+        const secondLastRun = getSecondLastRun(props.allRuns);
+        const lastRunPace = getRunPace(lastRun);
+        const secondLastRunPace = getRunPace(secondLastRun);
+
+        setCurrValue(lastRunPace);
+        setPrevValue(secondLastRunPace);
+        setPercentDiff(
+          Math.round(
+            getPercentageDiff(
+              getSecondsFromPace(lastRunPace),
+              getSecondsFromPace(secondLastRunPace)
+            )
+          )
+        );
+        setStateDiff(
+          getSecondsFromPace(lastRunPace) >=
+            getSecondsFromPace(secondLastRunPace)
+            ? 1
+            : -1
+        );
+    }
+  };
+
+  useEffect(() => {
+    if (props.allRuns.length > 0) {
+      const lastRun = getLastRun(props.allRuns);
+      const secondLastRun = getSecondLastRun(props.allRuns);
+      const lastRunPace = getRunPace(lastRun);
+      const secondLastRunPace = getRunPace(secondLastRun);
+
+      setCurrValue(lastRunPace);
+      setPrevValue(secondLastRunPace);
+      setPercentDiff(
+        Math.round(
+          getPercentageDiff(
+            getSecondsFromPace(lastRunPace),
+            getSecondsFromPace(secondLastRunPace)
+          )
+        )
+      );
+      setStateDiff(
+        getSecondsFromPace(lastRunPace) >= getSecondsFromPace(secondLastRunPace)
+          ? 1
+          : -1
+      );
+    }
+  }, [props.allRuns]);
 
   return (
-    <Card className={classes.root}>
-      <CardContent className={classes.cardContent}>
-        <Grid className={classes.gridOuter} container spacing={3}>
-          <Grid item>
-            <Typography
-              className={classes.title}
-              color="textSecondary"
-              gutterBottom
-            >
-              Pace
-            </Typography>
-            <Typography
-              className={classes.number}
-              color="textPrimary"
-              variant="h4"
-            >
-              5'19" avg
-            </Typography>
-          </Grid>
+    <ButtonBase className={classes.buttonBase} onClick={handleDisplayClick}>
+      <Card className={classes.root}>
+        <CardContent className={classes.cardContent}>
+          <Grid className={classes.gridOuter} container spacing={3}>
+            <Grid item>
+              <Typography
+                className={classes.title}
+                color="textSecondary"
+                gutterBottom
+              >
+                Pace
+              </Typography>
+              <Typography
+                className={classes.number}
+                color="textPrimary"
+                variant="h4"
+              >
+                {currValue} avg
+              </Typography>
+            </Grid>
 
-          <Grid item>
-            <Avatar className={classes.avatar}>
-              <PaceIcon />
-            </Avatar>
+            <Grid item>
+              <Avatar className={classes.avatar}>
+                <PaceIcon />
+              </Avatar>
+            </Grid>
           </Grid>
-        </Grid>
-        <Box className={classes.box}>
-          <ArrowUpwardIcon className={classes.arrow} />
-          <Typography className={classes.arrowText} variant="body2">
-            5%
-          </Typography>
-          <Typography color="textSecondary" variant="caption">
-            Since last week
-          </Typography>
-        </Box>
-      </CardContent>
-    </Card>
+          <Box className={classes.box}>
+            {stateDiff >= 0 ? (
+              <ArrowUpwardIcon className={classes.arrowPositive} />
+            ) : (
+              <ArrowDownwardIcon className={classes.arrowNegative} />
+            )}
+            <Typography
+              className={stateDiff >= 0 ? classes.positive : classes.negative}
+              variant="body2"
+            >
+              {percentDiff}%
+            </Typography>
+            <Typography color="textSecondary" variant="caption">
+              Since last {display} ({prevValue} avg)
+            </Typography>
+          </Box>
+        </CardContent>
+      </Card>
+    </ButtonBase>
   );
 }

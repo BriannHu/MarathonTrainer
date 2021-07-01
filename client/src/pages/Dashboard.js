@@ -118,11 +118,11 @@ export default function Dashboard() {
         {/* <Paper className={classes.paper}>Card 1</Paper> */}
       </Grid>
       <Grid item xs={12} sm={6} lg={3}>
-        <DurationCard />
+        <DurationCard allRuns={runs} />
         {/* <Paper className={classes.paper}>Card 2</Paper> */}
       </Grid>
       <Grid item xs={12} sm={6} lg={3}>
-        <PaceCard />
+        <PaceCard allRuns={runs} />
         {/* <Paper className={classes.paper}>Card 3</Paper> */}
       </Grid>
       <Grid item xs={12} sm={6} lg={3}>
