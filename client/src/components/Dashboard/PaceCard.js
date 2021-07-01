@@ -17,7 +17,6 @@ import {
   getCumulativeDistance,
   getCumulativeDuration,
   getTotalRunPace,
-  getRunDuration,
   getRunPace,
   getLastRun,
   getLastWeekRuns,
@@ -25,7 +24,6 @@ import {
   getSecondLastRun,
   getSecondLastWeekRuns,
   getSecondLastMonthRuns,
-  getSeconds,
   getSecondsFromPace,
   getPercentageDiff,
 } from "./CardUtilities";
