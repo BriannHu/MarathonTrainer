@@ -140,7 +140,7 @@ export default function CustomAppBar2() {
             />
           </IconButton>
           <Typography variant="h6" color="inherit" className={classes.grow}>
-            Running Tracker
+            Marathon Trainer
           </Typography>
           <IconButton color="inherit" className={classes.profile}>
             <AccountCircle />

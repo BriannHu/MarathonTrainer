@@ -76,7 +76,7 @@ export default function TargetCard() {
               color="textPrimary"
               variant="h4"
             >
-              86%
+              44%
             </Typography>
           </Grid>
 
@@ -93,7 +93,7 @@ export default function TargetCard() {
               colorPrimary: classes.colorPrimary,
               barColorPrimary: classes.barColorPrimary,
             }}
-            value={86}
+            value={44}
             variant="determinate"
           />
 
