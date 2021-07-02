@@ -6,7 +6,7 @@
 
 Marathon Trainer is full-stack web app that aims to provide all the statistics and functionalities that a runner would need in their training of an upcoming race. It consists of a dashboard that contains a high-level overview of the different components of the app, which can be expanded into a separate, more detailed page.
 
-![Dashboard Screenshot](client/public/screenshots/dashboard_screenshot.png)
+![Dashboard Screenshot](https://github.com/BriannHu/MarathonTrainer/blob/master/client/public/screenshots/dashboard_screenshot.PNG)
 
 ## Technologies Used
 
