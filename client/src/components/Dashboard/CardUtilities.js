@@ -162,9 +162,17 @@ export function getSecondLastRun(runs) {
 
 export function getSeconds(duration) {
   const times = duration.split(":");
-  const hrs = times[0];
-  const mins = times[1];
-  const secs = times[2];
+  var hrs = 0,
+    mins = 0,
+    secs = 0;
+  if (times.length === 3) {
+    hrs = times[0];
+    mins = times[1];
+    secs = times[2];
+  } else {
+    mins = times[0];
+    secs = times[1];
+  }
   const result = parseInt(hrs) * 3600 + parseInt(mins) * 60 + parseInt(secs);
   return result;
 }
