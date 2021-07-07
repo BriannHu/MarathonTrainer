@@ -1,11 +1,14 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 
 import classNames from "classnames";
 
 import { makeStyles } from "@material-ui/core/styles";
 import { colors } from "@material-ui/core";
-import AppBar from "@material-ui/core/AppBar";
 
+import AppBar from "@material-ui/core/AppBar";
+import Button from "@material-ui/core/Button";
+import Avatar from "@material-ui/core/Avatar";
 import Drawer from "@material-ui/core/Drawer";
 import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
@@ -18,7 +21,6 @@ import IconButton from "@material-ui/core/IconButton";
 import ScoreIcon from "@material-ui/icons/Score";
 import DashboardIcon from "@material-ui/icons/Dashboard";
 import MenuIcon from "@material-ui/icons/Menu";
-import AccountCircle from "@material-ui/icons/AccountCircle";
 
 const drawerWidth = 220;
 
@@ -109,12 +111,24 @@ const useStyles = makeStyles((theme) => ({
   title: {
     flexGrow: 1,
   },
+  listItem: {
+    "&:hover": {
+      color: "white",
+      opacity: 0.75,
+    },
+  },
 }));
 
 export default function CustomAppBar2() {
   const classes = useStyles();
-
   const [open, setOpen] = useState(false);
+  const [user, setUser] = useState(JSON.parse(localStorage.getItem("profile")));
+
+  useEffect(() => {
+    const token = user?.token;
+    console.log(token);
+    setUser(JSON.parse(localStorage.getItem("profile")));
+  }, [user?.token]);
 
   const handleDrawerClick = () => {
     setOpen(!open);
@@ -142,9 +156,27 @@ export default function CustomAppBar2() {
           <Typography variant="h6" color="inherit" className={classes.grow}>
             Marathon Trainer
           </Typography>
-          <IconButton color="inherit" className={classes.profile}>
-            <AccountCircle />
-          </IconButton>
+
+          {user?.result ? (
+            <IconButton color="inherit" className={classes.profile}>
+              <Avatar
+                className={classes.purple}
+                alt={user?.result.name}
+                src={user?.result.imageUrl}
+              >
+                {user?.result.name.charAt(0)}
+              </Avatar>
+            </IconButton>
+          ) : (
+            <Button
+              component={Link}
+              to="/auth"
+              color="inherit"
+              className={classes.profile}
+            >
+              Sign In
+            </Button>
+          )}
         </Toolbar>
       </AppBar>
       <Drawer
@@ -163,13 +195,25 @@ export default function CustomAppBar2() {
       >
         <div className={classes.toolbar} />
         <List>
-          <ListItem button key={"Dashboard"}>
+          <ListItem
+            button
+            className={classes.listItem}
+            key={"Dashboard"}
+            component={Link}
+            to="/"
+          >
             <ListItemIcon>
               <DashboardIcon className={classes.icon} />
             </ListItemIcon>
             <ListItemText primary={"Dashboard"} />
           </ListItem>
-          <ListItem button key={"Scores"}>
+          <ListItem
+            button
+            className={classes.listItem}
+            key={"Scores"}
+            component={Link}
+            to="/auth"
+          >
             <ListItemIcon>
               <ScoreIcon className={classes.icon} />
             </ListItemIcon>
