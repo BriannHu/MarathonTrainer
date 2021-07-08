@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
+
 import { makeStyles } from "@material-ui/core/styles";
 import Avatar from "@material-ui/core/Avatar";
 import Box from "@material-ui/core/Box";
@@ -77,8 +79,10 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function DistanceCard(props) {
+export default function DistanceCard() {
   const classes = useStyles();
+  const runs = useSelector((state) => state.runs);
+
   const [display, setDisplay] = useState("run");
   const [currValue, setCurrValue] = useState(0);
   const [prevValue, setPrevValue] = useState(0);
@@ -90,9 +94,9 @@ export default function DistanceCard(props) {
     switch (display) {
       case "run":
         setDisplay("week");
-        const lastWeekRuns = getLastWeekRuns(props.allRuns);
+        const lastWeekRuns = getLastWeekRuns(runs);
         const lastWeekDistance = getCumulativeDistance(lastWeekRuns);
-        const secondLastWeekRuns = getSecondLastWeekRuns(props.allRuns);
+        const secondLastWeekRuns = getSecondLastWeekRuns(runs);
         const secondLastWeekDistance =
           getCumulativeDistance(secondLastWeekRuns);
         setCurrValue(lastWeekDistance);
@@ -106,9 +110,9 @@ export default function DistanceCard(props) {
         break;
       case "week":
         setDisplay("month");
-        const lastMonthRuns = getLastMonthRuns(props.allRuns);
+        const lastMonthRuns = getLastMonthRuns(runs);
         const lastMonthDistance = getCumulativeDistance(lastMonthRuns);
-        const secondLastMonthRuns = getSecondLastMonthRuns(props.allRuns);
+        const secondLastMonthRuns = getSecondLastMonthRuns(runs);
         const secondLastMonthDistance =
           getCumulativeDistance(secondLastMonthRuns);
         setCurrValue(lastMonthDistance);
@@ -121,8 +125,8 @@ export default function DistanceCard(props) {
         setStateDiff(lastMonthDistance >= secondLastMonthDistance ? 1 : -1);
         break;
       default:
-        const lastRun = getLastRun(props.allRuns);
-        const secondLastRun = getSecondLastRun(props.allRuns);
+        const lastRun = getLastRun(runs);
+        const secondLastRun = getSecondLastRun(runs);
         setCurrValue(lastRun.distance);
         setPrevValue(secondLastRun.distance);
         setDisplay("run");
@@ -136,9 +140,9 @@ export default function DistanceCard(props) {
   };
 
   useEffect(() => {
-    if (props.allRuns.length > 0) {
-      const lastRun = getLastRun(props.allRuns);
-      const secondLastRun = getSecondLastRun(props.allRuns);
+    if (runs.length > 0) {
+      const lastRun = getLastRun(runs);
+      const secondLastRun = getSecondLastRun(runs);
       setCurrValue(lastRun.distance);
       setPrevValue(secondLastRun.distance);
       setPercentDiff(
@@ -146,7 +150,7 @@ export default function DistanceCard(props) {
       );
       setStateDiff(lastRun.distance >= secondLastRun.distance ? 1 : -1);
     }
-  }, [props.allRuns]);
+  }, [runs]);
 
   return (
     <ButtonBase className={classes.buttonBase} onClick={handleDisplayClick}>
