@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useSelector } from "react-redux";
 import PropTypes from "prop-types";
 
 import { lighten, makeStyles } from "@material-ui/core/styles";
@@ -318,6 +319,8 @@ EnhancedTableToolbar.propTypes = {
 
 export default function DisplayAllRuns(props) {
   const classes = useStyles();
+  const runs = useSelector((state) => state.runs);
+
   // stores runs to be mapped to rows, pulled from db
   // const [runs, setRuns] = useState([]);
 
@@ -357,7 +360,7 @@ export default function DisplayAllRuns(props) {
   };
 
   const onRevert = (id) => {
-    const newRuns = props.allRuns.map((run) => {
+    const newRuns = runs.map((run) => {
       if (run._id === id) {
         return previous[id]
           ? { ...previous[id], isEditMode: !run.isEditMode }
@@ -380,7 +383,7 @@ export default function DisplayAllRuns(props) {
 
   const handleSelectAllClick = (e) => {
     if (e.target.checked) {
-      const newSelecteds = props.allRuns.map((n) => n._id);
+      const newSelecteds = runs.map((n) => n._id);
       setSelected(newSelecteds);
       return;
     }
@@ -418,8 +421,7 @@ export default function DisplayAllRuns(props) {
 
   const isSelected = (name) => selected.indexOf(name) !== -1;
   const emptyRows =
-    rowsPerPage -
-    Math.min(rowsPerPage, props.allRuns.length - page * rowsPerPage);
+    rowsPerPage - Math.min(rowsPerPage, runs.length - page * rowsPerPage);
 
   return (
     <Paper className={classes.paper} elevation={2}>
@@ -440,10 +442,10 @@ export default function DisplayAllRuns(props) {
             orderBy={orderBy}
             onSelectAllClick={handleSelectAllClick}
             onRequestSort={handleRequestSort}
-            rowCount={props.allRuns.length}
+            rowCount={runs.length}
           />
           <TableBody>
-            {stableSort(props.allRuns, getComparator(order, orderBy))
+            {stableSort(runs, getComparator(order, orderBy))
               .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
               .map((run, index) => {
                 const isItemSelected = isSelected(run._id);
@@ -520,7 +522,7 @@ export default function DisplayAllRuns(props) {
       </TableContainer>
       <TablePagination
         component="div"
-        count={props.allRuns.length}
+        count={runs.length}
         rowsPerPage={rowsPerPage}
         rowsPerPageOptions={[5]}
         page={page}

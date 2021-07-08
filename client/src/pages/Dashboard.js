@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from "react";
-import Grid from "@material-ui/core/Grid";
+import { useDispatch } from "react-redux";
 
+import { getRuns } from "../actions/runs";
+
+import Grid from "@material-ui/core/Grid";
 import DistanceCard from "../components/Dashboard/DistanceCard";
 import DurationCard from "../components/Dashboard/DurationCard";
 import PaceCard from "../components/Dashboard/PaceCard";
@@ -14,19 +17,24 @@ import axios from "axios";
 
 export default function Dashboard() {
   const [runs, setRuns] = useState([]);
+  const dispatch = useDispatch();
 
   useEffect(() => {
-    setRuns([]); // prevents more entries from being added each render
-    axios
-      .get("http://localhost:5000/runs/")
-      .then((response) => {
-        setRuns(response.data);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-    // eslint-disable-next-line
-  }, []);
+    dispatch(getRuns());
+  }, [dispatch]);
+
+  // useEffect(() => {
+  //   setRuns([]); // prevents more entries from being added each render
+  //   axios
+  //     .get("http://localhost:5000/runs/")
+  //     .then((response) => {
+  //       setRuns(response.data);
+  //     })
+  //     .catch((error) => {
+  //       console.log(error);
+  //     });
+  //   // eslint-disable-next-line
+  // }, []);
 
   const createData = (
     id,

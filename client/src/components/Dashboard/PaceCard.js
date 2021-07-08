@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
+
 import { makeStyles } from "@material-ui/core/styles";
 import Avatar from "@material-ui/core/Avatar";
 import Box from "@material-ui/core/Box";
@@ -81,6 +83,8 @@ const useStyles = makeStyles((theme) => ({
 
 export default function PaceCard(props) {
   const classes = useStyles();
+  const runs = useSelector((state) => state.runs);
+
   const [display, setDisplay] = useState("run");
   const [currValue, setCurrValue] = useState(0);
   const [prevValue, setPrevValue] = useState(0);
@@ -92,7 +96,7 @@ export default function PaceCard(props) {
     switch (display) {
       case "run":
         setDisplay("week");
-        const lastWeekRuns = getLastWeekRuns(props.allRuns);
+        const lastWeekRuns = getLastWeekRuns(runs);
         const lastWeekDistance = getCumulativeDistance(lastWeekRuns);
         const lastWeekDuration = getCumulativeDuration(lastWeekRuns);
         const lastWeekPace = getTotalRunPace(
@@ -100,7 +104,7 @@ export default function PaceCard(props) {
           lastWeekDuration
         );
 
-        const secondLastWeekRuns = getSecondLastWeekRuns(props.allRuns);
+        const secondLastWeekRuns = getSecondLastWeekRuns(runs);
         const secondLastWeekDistance =
           getCumulativeDistance(secondLastWeekRuns);
         const secondLastWeekDuration =
@@ -130,7 +134,7 @@ export default function PaceCard(props) {
         break;
       case "week":
         setDisplay("month");
-        const lastMonthRuns = getLastMonthRuns(props.allRuns);
+        const lastMonthRuns = getLastMonthRuns(runs);
         const lastMonthDistance = getCumulativeDistance(lastMonthRuns);
         const lastMonthDuration = getCumulativeDuration(lastMonthRuns);
         const lastMonthPace = getTotalRunPace(
@@ -138,7 +142,7 @@ export default function PaceCard(props) {
           lastMonthDuration
         );
 
-        const secondLastMonthRuns = getSecondLastMonthRuns(props.allRuns);
+        const secondLastMonthRuns = getSecondLastMonthRuns(runs);
         const secondLastMonthDistance =
           getCumulativeDistance(secondLastMonthRuns);
         const secondLastMonthDuration =
@@ -168,8 +172,8 @@ export default function PaceCard(props) {
         break;
       default:
         setDisplay("run");
-        const lastRun = getLastRun(props.allRuns);
-        const secondLastRun = getSecondLastRun(props.allRuns);
+        const lastRun = getLastRun(runs);
+        const secondLastRun = getSecondLastRun(runs);
         const lastRunPace = getRunPace(lastRun);
         const secondLastRunPace = getRunPace(secondLastRun);
 
@@ -193,9 +197,9 @@ export default function PaceCard(props) {
   };
 
   useEffect(() => {
-    if (props.allRuns.length > 0) {
-      const lastRun = getLastRun(props.allRuns);
-      const secondLastRun = getSecondLastRun(props.allRuns);
+    if (runs.length > 0) {
+      const lastRun = getLastRun(runs);
+      const secondLastRun = getSecondLastRun(runs);
       const lastRunPace = getRunPace(lastRun);
       const secondLastRunPace = getRunPace(secondLastRun);
 
@@ -215,7 +219,7 @@ export default function PaceCard(props) {
           : -1
       );
     }
-  }, [props.allRuns]);
+  }, [runs]);
 
   return (
     <ButtonBase className={classes.buttonBase} onClick={handleDisplayClick}>
