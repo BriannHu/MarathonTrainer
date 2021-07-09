@@ -31,7 +31,7 @@ router.route("/add").post((req, res) => {
   newRun.save(function (err, run) {
     return run
       .save()
-      .then(() => res.json(run._id))
+      .then((run) => res.json(run))
       .catch((err) => res.status(400).json("Error: " + err));
   });
 });

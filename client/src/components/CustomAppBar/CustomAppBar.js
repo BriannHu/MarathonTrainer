@@ -125,8 +125,8 @@ export default function CustomAppBar2() {
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("profile")));
 
   useEffect(() => {
-    const token = user?.token;
-    console.log(token);
+    //const token = user?.token;
+    //console.log(token);
     setUser(JSON.parse(localStorage.getItem("profile")));
   }, [user?.token]);
 

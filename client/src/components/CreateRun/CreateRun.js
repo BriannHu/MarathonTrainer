@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+
 import axios from "axios";
 import "react-datepicker/dist/react-datepicker.css";
 
@@ -34,6 +35,7 @@ const useStyles = makeStyles({
 
 export default function CreateRun2() {
   const classes = useStyles();
+
   const [name, setName] = useState("");
   const [date, setDate] = useState(new Date());
   const [distance, setDistance] = useState(0);
@@ -57,8 +59,8 @@ export default function CreateRun2() {
     e.preventDefault();
 
     const run = { name, date, distance, duration, pace };
-
-    console.log(run);
+    //dispatch(createRun(run));
+    // console.log(run);
 
     axios
       .post("http://localhost:5000/runs/add", run)
