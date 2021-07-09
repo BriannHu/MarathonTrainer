@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import { useDispatch } from "react-redux";
+
+import { createRun } from "../../actions/runs";
 import { makeStyles } from "@material-ui/core/styles";
 
 import {
@@ -69,10 +71,12 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function QuickAdd(props) {
+export default function QuickAdd() {
   const classes = useStyles();
+  const dispatch = useDispatch();
+
   const [name, setName] = useState("");
-  const [date, setDate] = useState(new Date().toISOString());
+  const [date, setDate] = useState(getFormattedDate());
   const [distance, setDistance] = useState(0);
   const [hours, setHours] = useState(0);
   const [minutes, setMinutes] = useState(0);
@@ -83,7 +87,7 @@ export default function QuickAdd(props) {
   const [hourError, setHourError] = useState(false);
   const [minsError, setMinsError] = useState(false);
   const [secsError, setSecsError] = useState(false);
-  const [id, setId] = useState("");
+  const [changedDate, setChangedDate] = useState(false);
 
   function getFormattedDate() {
     const today = new Date();
@@ -96,6 +100,17 @@ export default function QuickAdd(props) {
     const formattedDate = `${year}-${month}-${day}T${hours}:${mins}`;
     return formattedDate;
   }
+
+  // If user doesn't touch Date input, it will automatically update every minute.
+  // Prevents runs being registered to same minute otherwise.
+  useEffect(() => {
+    if (!changedDate) {
+      var timer = setInterval(() => setDate(getFormattedDate), 1000);
+      return function cleanup() {
+        clearInterval(timer);
+      };
+    }
+  });
 
   useEffect(() => {
     var hrs = hours;
@@ -129,11 +144,12 @@ export default function QuickAdd(props) {
       paceMinutes,
       paceSeconds,
     };
-    axios
-      .post("http://localhost:5000/runs/add", run)
-      .then((res) => setId(res.data));
+    dispatch(createRun(run));
+    // axios
+    //   .post("http://localhost:5000/runs/add", run)
+    //   .then((res) => setId(res.data));
 
-    props.handleRunChange(run, id);
+    //props.handleRunChange(run, id);
   };
 
   const onDistanceChange = (e) => {
@@ -158,6 +174,11 @@ export default function QuickAdd(props) {
   const onSecsChange = (e) => {
     setSecsError(false);
     setSeconds(e.target.value);
+  };
+
+  const onDateChange = (e) => {
+    const convertedDate = new Date(e.target.value);
+    setDate(convertedDate.toISOString());
   };
 
   return (
@@ -194,7 +215,7 @@ export default function QuickAdd(props) {
                 variant="outlined"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                fullWidth={true}
+                fullWidth
               />
             </Grid>
           </Grid>
@@ -204,11 +225,12 @@ export default function QuickAdd(props) {
                 className={classes.normalOutline}
                 variant="outlined"
                 type="datetime-local"
-                defaultValue={getFormattedDate()}
+                value={date}
                 onChange={(e) => {
-                  setDate(e.target.value.toISOString());
+                  onDateChange(e);
                 }}
-                fullWidth={true}
+                onClick={() => setChangedDate(true)}
+                fullWidth
               />
             </Grid>
           </Grid>
@@ -220,7 +242,7 @@ export default function QuickAdd(props) {
                 type="number"
                 error={distError || distance < 0}
                 onChange={(e) => onDistanceChange(e)}
-                fullWidth={true}
+                fullWidth
               />
             </Grid>
             <Grid item xs={3}>
@@ -244,7 +266,7 @@ export default function QuickAdd(props) {
                 error={hourError || hours < 0}
                 onChange={(e) => onHourChange(e)}
                 type="number"
-                fullWidth={true}
+                fullWidth
               />
             </Grid>
             <Grid item xs={4}>
@@ -262,7 +284,7 @@ export default function QuickAdd(props) {
                 error={minsError || minutes < 0 || minutes > 59}
                 onChange={(e) => onMinsChange(e)}
                 type="number"
-                fullWidth={true}
+                fullWidth
               />
             </Grid>
             <Grid item xs={4}>
@@ -280,7 +302,7 @@ export default function QuickAdd(props) {
                 error={secsError || seconds < 0 || seconds > 59}
                 onChange={(e) => onSecsChange(e)}
                 type="number"
-                fullWidth={true}
+                fullWidth
               />
             </Grid>
           </Grid>
@@ -293,7 +315,7 @@ export default function QuickAdd(props) {
                   readOnly: true,
                   style: { fontWeight: 600, textAlign: "center" },
                 }}
-                fullWidth={true}
+                fullWidth
                 value={`${paceMinutes || 0}'${
                   paceSeconds < 10 ? "0" + paceSeconds : paceSeconds || "00"
                 }"`}
