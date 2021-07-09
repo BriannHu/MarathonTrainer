@@ -1,3 +1,4 @@
+import { FETCH_ALL, CREATE, UPDATE, DELETE } from "../constants/ActionTypes";
 import * as api from "../api";
 
 // Action Creators
@@ -5,7 +6,7 @@ import * as api from "../api";
 export const getRuns = () => async (dispatch) => {
   try {
     const { data } = await api.fetchRuns();
-    dispatch({ type: "FETCH_ALL", payload: data });
+    dispatch({ type: FETCH_ALL, payload: data });
   } catch (error) {
     console.log(error);
   }
@@ -14,7 +15,7 @@ export const getRuns = () => async (dispatch) => {
 export const createRun = (run) => async (dispatch) => {
   try {
     const { data } = await api.createRun(run);
-    dispatch({ type: "CREATE", payload: data });
+    dispatch({ type: CREATE, payload: data });
   } catch (error) {
     console.log(error);
   }
@@ -23,7 +24,7 @@ export const createRun = (run) => async (dispatch) => {
 export const updateRun = (id, run) => async (dispatch) => {
   try {
     const { data } = await api.updateRun(id, run);
-    dispatch({ type: "UPDATE", payload: data });
+    dispatch({ type: UPDATE, payload: data });
   } catch (error) {
     console.log(error);
   }
@@ -33,7 +34,7 @@ export const deleteRun = (id) => async (dispatch) => {
   try {
     await api.deleteRun(id);
 
-    dispatch({ type: "DELETE", payload: id });
+    dispatch({ type: DELETE, payload: id });
   } catch (error) {
     console.log(error);
   }
