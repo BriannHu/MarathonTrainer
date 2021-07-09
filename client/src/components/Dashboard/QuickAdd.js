@@ -76,7 +76,7 @@ export default function QuickAdd() {
   const dispatch = useDispatch();
 
   const [name, setName] = useState("");
-  const [date, setDate] = useState(getFormattedDate());
+  const [date, setDate] = useState(getFormattedDate(new Date()));
   const [distance, setDistance] = useState(0);
   const [hours, setHours] = useState(0);
   const [minutes, setMinutes] = useState(0);
@@ -87,10 +87,16 @@ export default function QuickAdd() {
   const [hourError, setHourError] = useState(false);
   const [minsError, setMinsError] = useState(false);
   const [secsError, setSecsError] = useState(false);
+
+  // Additional helper hooks for Date functionality
+  // NOTE: Displaying date requires different format from submitting date.
+  //       Different format is handled by getFormattedDate().
+  // NOTE: The date field will automatically update each minute UNTIL
+  //       the user clicks on it.
+  const [displayDate, setDisplayDate] = useState(getFormattedDate(new Date()));
   const [changedDate, setChangedDate] = useState(false);
 
-  function getFormattedDate() {
-    const today = new Date();
+  function getFormattedDate(today) {
     const year = today.getFullYear();
     const month =
       (today.getMonth() + 1 < 10 ? "0" : "") + (today.getMonth() + 1);
@@ -102,10 +108,13 @@ export default function QuickAdd() {
   }
 
   // If user doesn't touch Date input, it will automatically update every minute.
-  // Prevents runs being registered to same minute otherwise.
+  // Prevents runs being registered to same minute
   useEffect(() => {
     if (!changedDate) {
-      var timer = setInterval(() => setDate(getFormattedDate), 1000);
+      var timer = setInterval(
+        () => setDisplayDate(getFormattedDate(new Date())),
+        1000
+      );
       return function cleanup() {
         clearInterval(timer);
       };
@@ -145,11 +154,6 @@ export default function QuickAdd() {
       paceSeconds,
     };
     dispatch(createRun(run));
-    // axios
-    //   .post("http://localhost:5000/runs/add", run)
-    //   .then((res) => setId(res.data));
-
-    //props.handleRunChange(run, id);
   };
 
   const onDistanceChange = (e) => {
@@ -178,6 +182,7 @@ export default function QuickAdd() {
 
   const onDateChange = (e) => {
     const convertedDate = new Date(e.target.value);
+    setDisplayDate(getFormattedDate(convertedDate));
     setDate(convertedDate.toISOString());
   };
 
@@ -225,7 +230,7 @@ export default function QuickAdd() {
                 className={classes.normalOutline}
                 variant="outlined"
                 type="datetime-local"
-                value={date}
+                value={displayDate}
                 onChange={(e) => {
                   onDateChange(e);
                 }}
