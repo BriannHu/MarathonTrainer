@@ -3,7 +3,7 @@ const runReducer = (runs = [], action) => {
     case "FETCH_ALL":
       return action.payload;
     case "CREATE":
-      return runs;
+      return [...runs, action.payload];
     default:
       return runs;
   }
