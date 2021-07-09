@@ -28,3 +28,13 @@ export const updateRun = (id, run) => async (dispatch) => {
     console.log(error);
   }
 };
+
+export const deleteRun = (id) => async (dispatch) => {
+  try {
+    await api.deleteRun(id);
+
+    dispatch({ type: "DELETE", payload: id });
+  } catch (error) {
+    console.log(error);
+  }
+};

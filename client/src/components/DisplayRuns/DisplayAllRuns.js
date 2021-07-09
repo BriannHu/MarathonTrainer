@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { updateRun } from "../../actions/runs";
+import { deleteRun, updateRun } from "../../actions/runs";
 import PropTypes from "prop-types";
 
 import { lighten, makeStyles } from "@material-ui/core/styles";
@@ -261,7 +261,9 @@ function exportRuns() {
 
 const EnhancedTableToolbar = (props) => {
   const classes = useToolbarStyles();
-  const { numSelected, handleRunDelete, selected, setSelected } = props;
+  const dispatch = useDispatch();
+
+  const { numSelected, selected, setSelected } = props;
   return (
     <Toolbar className={classes.root}>
       <Typography
@@ -292,7 +294,7 @@ const EnhancedTableToolbar = (props) => {
             className={classes.button}
             startIcon={<DeleteIcon />}
             onClick={() => {
-              handleRunDelete(selected);
+              selected.forEach((id) => dispatch(deleteRun(id)));
               setSelected([]);
             }}
           >
@@ -468,9 +470,6 @@ export default function DisplayAllRuns(props) {
         numSelected={selected.length}
         selected={selected}
         setSelected={setSelected}
-        handleRunDelete={props.handleRunDelete}
-        // setRuns={setRuns}
-        // runs={runs}
       />
       <TableContainer>
         <Table className={classes.table} aria-label="data-table" size="small">
