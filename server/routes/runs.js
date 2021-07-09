@@ -61,7 +61,7 @@ router.route("/edit/:id").post((req, res) => {
       run.paceSeconds = Number(req.body.paceSeconds);
       run
         .save()
-        .then(() => res.json("Run updated!"))
+        .then(() => res.json(run))
         .catch((err) => res.status(400).json("Error: " + err));
     })
     .catch((err) => res.status(400).json("Error: " + err));

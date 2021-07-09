@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { updateRun } from "../../actions/runs";
 import PropTypes from "prop-types";
 
 import { lighten, makeStyles } from "@material-ui/core/styles";
@@ -327,6 +328,7 @@ const createData = (run) => ({
 
 export default function DisplayAllRuns(props) {
   const classes = useStyles();
+  const dispatch = useDispatch();
   const runs = useSelector((state) => state.runs);
   // console.log(runs.map((run) => createData(run)));
   const [currRuns, setCurrRuns] = useState(runs.map((run) => createData(run)));
@@ -354,7 +356,7 @@ export default function DisplayAllRuns(props) {
     setCurrRuns(runs.map((run) => createData(run)));
   }, [runs]);
 
-  const onToggleEditMode = (run, id) => {
+  const onToggleEditMode = (run, id, done) => {
     if (!previous[id]) {
       setPrevious((state) => ({ ...state, [id]: run }));
     } else {
@@ -363,14 +365,21 @@ export default function DisplayAllRuns(props) {
         return state;
       });
     }
+    var editedId;
+    var editedRun;
     setCurrRuns((state) => {
       return currRuns.map((run) => {
         if (run._id === id) {
+          editedId = run._id;
+          editedRun = run;
           return { ...run, isEditMode: !run.isEditMode };
         }
         return run;
       });
     });
+    if (done) {
+      dispatch(updateRun(editedId, editedRun));
+    }
   };
 
   const onChange = (e, run) => {
@@ -505,7 +514,7 @@ export default function DisplayAllRuns(props) {
                         <>
                           <IconButton
                             aria-label="done"
-                            onClick={() => onToggleEditMode(run, run._id)}
+                            onClick={() => onToggleEditMode(run, run._id, true)}
                           >
                             <DoneIcon />
                           </IconButton>
@@ -529,7 +538,9 @@ export default function DisplayAllRuns(props) {
                           </IconButton>
                           <IconButton
                             aria-label="edit"
-                            onClick={() => onToggleEditMode(run, run._id)}
+                            onClick={() =>
+                              onToggleEditMode(run, run._id, false)
+                            }
                           >
                             <i
                               className="far fa-edit"
