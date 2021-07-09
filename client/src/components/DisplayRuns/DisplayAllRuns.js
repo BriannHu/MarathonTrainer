@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import PropTypes from "prop-types";
 
@@ -317,9 +317,19 @@ EnhancedTableToolbar.propTypes = {
   numSelected: PropTypes.number.isRequired,
 };
 
+const createData = (run) => ({
+  // pre-emptively set MongoDB ID
+  // can add multiple runs and select individually
+  // otherwise have to refresh page to load runs from MongoDB for _id's
+  ...run,
+  isEditMode: false,
+});
+
 export default function DisplayAllRuns(props) {
   const classes = useStyles();
   const runs = useSelector((state) => state.runs);
+  // console.log(runs.map((run) => createData(run)));
+  const [currRuns, setCurrRuns] = useState(runs.map((run) => createData(run)));
 
   // stores runs to be mapped to rows, pulled from db
   // const [runs, setRuns] = useState([]);
@@ -340,6 +350,10 @@ export default function DisplayAllRuns(props) {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
+  useEffect(() => {
+    setCurrRuns(runs.map((run) => createData(run)));
+  }, [runs]);
+
   const onToggleEditMode = (run, id) => {
     if (!previous[id]) {
       setPrevious((state) => ({ ...state, [id]: run }));
@@ -349,18 +363,34 @@ export default function DisplayAllRuns(props) {
         return state;
       });
     }
-    props.handleRunEdit(run, id);
+    setCurrRuns((state) => {
+      return currRuns.map((run) => {
+        if (run._id === id) {
+          return { ...run, isEditMode: !run.isEditMode };
+        }
+        return run;
+      });
+    });
   };
 
   const onChange = (e, run) => {
     if (!previous[run._id]) {
       setPrevious((state) => ({ ...state, [run._id]: run }));
     }
-    props.handleRunEditChange(e, run);
+    const value = e.target.value;
+    const name = e.target.name;
+    const { _id } = run;
+    const newRuns = currRuns.map((run) => {
+      if (run._id === _id) {
+        return { ...run, [name]: value };
+      }
+      return run;
+    });
+    setCurrRuns(newRuns);
   };
 
   const onRevert = (id) => {
-    const newRuns = runs.map((run) => {
+    const newRuns = currRuns.map((run) => {
       if (run._id === id) {
         return previous[id]
           ? { ...previous[id], isEditMode: !run.isEditMode }
@@ -372,7 +402,7 @@ export default function DisplayAllRuns(props) {
       delete state[id];
       return state;
     });
-    props.handleRunRevert(newRuns);
+    setCurrRuns(newRuns);
   };
 
   const handleRequestSort = (e, property) => {
@@ -383,7 +413,7 @@ export default function DisplayAllRuns(props) {
 
   const handleSelectAllClick = (e) => {
     if (e.target.checked) {
-      const newSelecteds = runs.map((n) => n._id);
+      const newSelecteds = currRuns.map((n) => n._id);
       setSelected(newSelecteds);
       return;
     }
@@ -421,7 +451,7 @@ export default function DisplayAllRuns(props) {
 
   const isSelected = (name) => selected.indexOf(name) !== -1;
   const emptyRows =
-    rowsPerPage - Math.min(rowsPerPage, runs.length - page * rowsPerPage);
+    rowsPerPage - Math.min(rowsPerPage, currRuns.length - page * rowsPerPage);
 
   return (
     <Paper className={classes.paper} elevation={2}>
@@ -442,10 +472,10 @@ export default function DisplayAllRuns(props) {
             orderBy={orderBy}
             onSelectAllClick={handleSelectAllClick}
             onRequestSort={handleRequestSort}
-            rowCount={runs.length}
+            rowCount={currRuns.length}
           />
           <TableBody>
-            {stableSort(runs, getComparator(order, orderBy))
+            {stableSort(currRuns, getComparator(order, orderBy))
               .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
               .map((run, index) => {
                 const isItemSelected = isSelected(run._id);
@@ -522,7 +552,7 @@ export default function DisplayAllRuns(props) {
       </TableContainer>
       <TablePagination
         component="div"
-        count={runs.length}
+        count={currRuns.length}
         rowsPerPage={rowsPerPage}
         rowsPerPageOptions={[5]}
         page={page}
