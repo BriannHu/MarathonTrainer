@@ -328,7 +328,7 @@ const createData = (run) => ({
   isEditMode: false,
 });
 
-export default function DisplayAllRuns(props) {
+export default function DisplayAllRuns() {
   const classes = useStyles();
   const dispatch = useDispatch();
   const runs = useSelector((state) => state.runs);
