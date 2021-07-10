@@ -69,6 +69,10 @@ export default makeStyles((theme) => ({
   icon: {
     color: "white",
   },
+  purple: {
+    backgroundColor: colors.red[500],
+    color: theme.palette.getContrastText(colors.red[500]),
+  },
   profile: {
     marginRight: theme.spacing(2),
   },
