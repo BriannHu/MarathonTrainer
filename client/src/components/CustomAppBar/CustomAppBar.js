@@ -3,6 +3,7 @@ import { Link, useHistory, useLocation } from "react-router-dom";
 import { useDispatch } from "react-redux";
 
 import classNames from "classnames";
+import decode from "jwt-decode";
 
 import AppBar from "@material-ui/core/AppBar";
 import Button from "@material-ui/core/Button";
@@ -32,10 +33,17 @@ export default function CustomAppBar() {
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("profile")));
 
   useEffect(() => {
-    //const token = user?.token;
+    const token = user?.token;
     setUser(JSON.parse(localStorage.getItem("profile")));
-    // console.log(user);
-  }, [location]);
+    if (token) {
+      const decodedToken = decode(token);
+      // if token is expired, log user out (should be after a year)
+      if (decodedToken.exp * 1000 < new Date().getTime()) {
+        handleLogout();
+      }
+    }
+    // eslint-disable-next-line
+  }, [location, user?.token]);
 
   const handleDrawerClick = () => {
     setOpen(!open);
