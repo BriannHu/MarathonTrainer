@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
+import { useDispatch } from "react-redux";
 import { useHistory } from "react-router-dom";
+import { signin, signup } from "../../actions/auth";
 
 import {
   Avatar,
@@ -16,7 +18,6 @@ import Icon from "./Icon";
 import Input from "./Input";
 
 import { GoogleLogin } from "react-google-login";
-import { useDispatch } from "react-redux";
 import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
 
 const useStyles = makeStyles((theme) => ({
@@ -58,14 +59,29 @@ export default function Auth() {
   const dispatch = useDispatch();
   const history = useHistory();
 
-  const [form, setForm] = useState(initialState);
+  const [formData, setFormData] = useState(initialState);
   const [isSignup, setIsSignup] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
   const handleShowPassword = () => setShowPassword(!showPassword);
 
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    console.log(formData);
+
+    if (isSignup) {
+      dispatch(signup(formData, history));
+    } else {
+      dispatch(signin(formData, history));
+    }
+  };
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
   const switchMode = () => {
-    setForm(initialState);
+    setFormData(initialState);
     setIsSignup((prevIsSignup) => !prevIsSignup);
     setShowPassword(false);
   };
@@ -97,24 +113,42 @@ export default function Auth() {
         <Typography component="h1" variant="h5">
           {isSignup ? "Sign up" : "Sign in"}
         </Typography>
-        <form className={classes.form}>
+        <form className={classes.form} onSubmit={handleSubmit}>
           <Grid container spacing={2}>
             {isSignup && (
               <>
-                <Input name="firstName" label="First Name" autoFocus half />
-                <Input name="lastName" label="Last Name" half />
+                <Input
+                  name="firstName"
+                  label="First Name"
+                  handleChange={handleChange}
+                  autoFocus
+                  half
+                />
+                <Input
+                  name="lastName"
+                  label="Last Name"
+                  handleChange={handleChange}
+                  half
+                />
               </>
             )}
-            <Input name="email" label="Email Address" type="email" />
+            <Input
+              name="email"
+              label="Email Address"
+              handleChange={handleChange}
+              type="email"
+            />
             <Input
               name="password"
               label="Password"
+              handleChange={handleChange}
               handleShowPassword={handleShowPassword}
             />
             {isSignup && (
               <Input
                 name="confirmPassword"
                 label="Confirm Password"
+                handleChange={handleChange}
                 type="password"
               />
             )}
