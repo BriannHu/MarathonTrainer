@@ -22,7 +22,7 @@ import MenuIcon from "@material-ui/icons/Menu";
 
 import useStyles from "./styles";
 
-export default function CustomAppBar2() {
+export default function CustomAppBar() {
   const classes = useStyles();
   const dispatch = useDispatch();
   const history = useHistory();
@@ -34,6 +34,7 @@ export default function CustomAppBar2() {
   useEffect(() => {
     //const token = user?.token;
     setUser(JSON.parse(localStorage.getItem("profile")));
+    // console.log(user);
   }, [location]);
 
   const handleDrawerClick = () => {

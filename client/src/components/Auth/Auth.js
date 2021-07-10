@@ -67,10 +67,9 @@ export default function Auth() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log(formData);
-
     if (isSignup) {
       dispatch(signup(formData, history));
+      history.push("/");
     } else {
       dispatch(signin(formData, history));
     }
@@ -142,6 +141,7 @@ export default function Auth() {
               name="password"
               label="Password"
               handleChange={handleChange}
+              type={showPassword ? "text" : "password"}
               handleShowPassword={handleShowPassword}
             />
             {isSignup && (
