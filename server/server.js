@@ -22,11 +22,9 @@ connection.once("open", () => {
   console.log("MongoDB database connection established successfully");
 });
 
-const usersRouter = require("./routes/users");
 const runsRouter = require("./routes/runs");
 const exportRouter = require("./routes/exports");
 
-app.use("/users", usersRouter);
 app.use("/runs", runsRouter);
 app.use("/exports", exportRouter);
 
