@@ -2,12 +2,12 @@ export const PrimaryItems = [
   {
     name: "Account",
     icon: "account_circle",
-    target: "/",
+    target: "/account",
   },
   {
     name: "Dashboard",
     icon: "dashboard",
-    target: "/",
+    target: "/dashboard",
   },
 ];
 

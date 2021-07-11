@@ -33,7 +33,7 @@ export default function MainLayout() {
         <main className={classes.content}>
           <div className={classes.toolbar} />
           <Switch>
-            <Route path="/" exact component={Dashboard} />
+            <Route path="/dashboard" exact component={Dashboard} />
             <Route path="/auth" exact component={Auth} />
           </Switch>
           {/* <Dashboard /> */}

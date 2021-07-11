@@ -69,7 +69,6 @@ export default function Auth() {
     e.preventDefault();
     if (isSignup) {
       dispatch(signup(formData, history));
-      history.push("/");
     } else {
       dispatch(signin(formData, history));
     }
@@ -91,7 +90,7 @@ export default function Auth() {
 
     try {
       dispatch({ type: "AUTH", data: { result, token } });
-      history.push("/");
+      history.push("/dashboard");
     } catch (error) {
       console.log(error);
     }
