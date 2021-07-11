@@ -13,16 +13,16 @@ import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
+import MenuItem from "@material-ui/core/MenuItem";
+import Menu from "@material-ui/core/Menu";
 import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
 import IconButton from "@material-ui/core/IconButton";
-
-import ScheduleIcon from "@material-ui/icons/Today";
-import GraphIcon from "@material-ui/icons/Equalizer";
-import TableChartIcon from "@material-ui/icons/TableChart";
-import ScoreIcon from "@material-ui/icons/Score";
-import DashboardIcon from "@material-ui/icons/Dashboard";
+import Icon from "@material-ui/core/Icon";
+import Divider from "@material-ui/core/Divider";
 import MenuIcon from "@material-ui/icons/Menu";
+
+import { PrimaryItems, SecondaryItems } from "./SidebarItems";
 
 import useStyles from "./styles";
 
@@ -32,6 +32,7 @@ export default function CustomAppBar() {
   const history = useHistory();
   const location = useLocation();
 
+  const [anchorEl, setAnchorEl] = useState(null);
   const [open, setOpen] = useState(false);
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("profile")));
 
@@ -52,6 +53,14 @@ export default function CustomAppBar() {
     setOpen(!open);
   };
 
+  const handleMenu = (e) => {
+    setAnchorEl(e.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
   const handleLogout = () => {
     dispatch({ type: "LOGOUT" });
 
@@ -60,6 +69,7 @@ export default function CustomAppBar() {
     setUser(null);
   };
 
+  const anchorOpen = Boolean(anchorEl);
   return (
     <>
       <AppBar className={classes.appBar} position="fixed">
@@ -85,7 +95,13 @@ export default function CustomAppBar() {
 
           {user?.result ? (
             <>
-              <IconButton color="inherit" className={classes.profile}>
+              <IconButton
+                aria-owns={anchorOpen ? "menu-appbar" : undefined}
+                aria-haspopup="true"
+                color="inherit"
+                className={classes.profile}
+                onClick={handleMenu}
+              >
                 <Avatar
                   className={classes.purple}
                   alt={user?.result.name}
@@ -94,14 +110,17 @@ export default function CustomAppBar() {
                   {user?.result.name.charAt(0).toUpperCase()}
                 </Avatar>
               </IconButton>
-              <Button
-                variant="contained"
-                className={classes.logout}
-                color="secondary"
-                onClick={handleLogout}
+              <Menu
+                id="menu-appbar"
+                anchorEl={anchorEl}
+                getContentAnchorEl={null}
+                anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+                transformOrigin={{ vertical: "top", horizontal: "right" }}
+                open={anchorOpen}
+                onClose={handleClose}
               >
-                Logout
-              </Button>
+                <MenuItem onClick={handleLogout}>Logout</MenuItem>
+              </Menu>
             </>
           ) : (
             <Button
@@ -131,66 +150,39 @@ export default function CustomAppBar() {
       >
         <div className={classes.toolbar} />
         <List>
-          <ListItem
-            button
-            className={classes.listItem}
-            key={"Dashboard"}
-            component={Link}
-            to="/"
-          >
-            <ListItemIcon>
-              <DashboardIcon className={classes.icon} />
-            </ListItemIcon>
-            <ListItemText primary={"Dashboard"} />
-          </ListItem>
-          <ListItem
-            button
-            className={classes.listItem}
-            key={"Overview"}
-            component={Link}
-            to="/"
-          >
-            <ListItemIcon>
-              <GraphIcon className={classes.icon} />
-            </ListItemIcon>
-            <ListItemText primary={"Overview"} />
-          </ListItem>
-          <ListItem
-            button
-            className={classes.listItem}
-            key={"Summary"}
-            component={Link}
-            to="/"
-          >
-            <ListItemIcon>
-              <TableChartIcon className={classes.icon} />
-            </ListItemIcon>
-            <ListItemText primary={"Summary"} />
-          </ListItem>
-          <ListItem
-            button
-            className={classes.listItem}
-            key={"Schedule"}
-            component={Link}
-            to="/"
-          >
-            <ListItemIcon>
-              <ScheduleIcon className={classes.icon} />
-            </ListItemIcon>
-            <ListItemText primary={"Schedule"} />
-          </ListItem>
-          <ListItem
-            button
-            className={classes.listItem}
-            key={"Scores"}
-            component={Link}
-            to="/auth"
-          >
-            <ListItemIcon>
-              <ScoreIcon className={classes.icon} />
-            </ListItemIcon>
-            <ListItemText primary={"Scores"} />
-          </ListItem>
+          {PrimaryItems.map((item, index) => {
+            return (
+              <ListItem
+                button
+                className={classes.listItem}
+                component={Link}
+                key={item.name}
+                to={item.target}
+              >
+                <ListItemIcon>
+                  <Icon className={classes.icon}>{item.icon}</Icon>
+                </ListItemIcon>
+                <ListItemText primary={item.name} />
+              </ListItem>
+            );
+          })}
+          <Divider classes={{ root: classes.dividerColor }} />
+          {SecondaryItems.map((item, index) => {
+            return (
+              <ListItem
+                button
+                className={classes.listItem}
+                component={Link}
+                key={item.name}
+                to={item.target}
+              >
+                <ListItemIcon>
+                  <Icon className={classes.icon}>{item.icon}</Icon>
+                </ListItemIcon>
+                <ListItemText primary={item.name} />
+              </ListItem>
+            );
+          })}
         </List>
       </Drawer>
     </>

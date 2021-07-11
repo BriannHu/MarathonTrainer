@@ -18,6 +18,9 @@ export default makeStyles((theme) => ({
       duration: theme.transitions.duration.enteringScreen,
     }),
   },
+  dividerColor: {
+    backgroundColor: "white",
+  },
   menuButton: {
     marginLeft: theme.spacing(1),
     marginRight: theme.spacing(2),
@@ -63,7 +66,7 @@ export default makeStyles((theme) => ({
     overflowX: "hidden",
     width: theme.spacing(7) + 1,
     [theme.breakpoints.up("sm")]: {
-      width: theme.spacing(9) + 1,
+      width: theme.spacing(8),
     },
   },
   icon: {
@@ -79,7 +82,7 @@ export default makeStyles((theme) => ({
   toolbar: {
     display: "flex",
     alignItems: "center",
-    marginTop: theme.spacing(1),
+    marginTop: theme.spacing(0),
     justifyContent: "flex-end",
     padding: "0 8px",
     ...theme.mixins.toolbar,
