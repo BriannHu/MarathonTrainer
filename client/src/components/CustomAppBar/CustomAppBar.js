@@ -17,6 +17,9 @@ import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
 import IconButton from "@material-ui/core/IconButton";
 
+import ScheduleIcon from "@material-ui/icons/Today";
+import GraphIcon from "@material-ui/icons/Equalizer";
+import TableChartIcon from "@material-ui/icons/TableChart";
 import ScoreIcon from "@material-ui/icons/Score";
 import DashboardIcon from "@material-ui/icons/Dashboard";
 import MenuIcon from "@material-ui/icons/Menu";
@@ -139,6 +142,42 @@ export default function CustomAppBar() {
               <DashboardIcon className={classes.icon} />
             </ListItemIcon>
             <ListItemText primary={"Dashboard"} />
+          </ListItem>
+          <ListItem
+            button
+            className={classes.listItem}
+            key={"Overview"}
+            component={Link}
+            to="/"
+          >
+            <ListItemIcon>
+              <GraphIcon className={classes.icon} />
+            </ListItemIcon>
+            <ListItemText primary={"Overview"} />
+          </ListItem>
+          <ListItem
+            button
+            className={classes.listItem}
+            key={"Summary"}
+            component={Link}
+            to="/"
+          >
+            <ListItemIcon>
+              <TableChartIcon className={classes.icon} />
+            </ListItemIcon>
+            <ListItemText primary={"Summary"} />
+          </ListItem>
+          <ListItem
+            button
+            className={classes.listItem}
+            key={"Schedule"}
+            component={Link}
+            to="/"
+          >
+            <ListItemIcon>
+              <ScheduleIcon className={classes.icon} />
+            </ListItemIcon>
+            <ListItemText primary={"Schedule"} />
           </ListItem>
           <ListItem
             button
