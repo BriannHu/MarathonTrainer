@@ -10,9 +10,10 @@ Marathon Trainer is full-stack web app that aims to provide all the statistics a
 
 ## Technologies Used
 
-- **React (Material UI)**: Styles frontend of the app using Material UI components, with additional React libraries used such as React-Chartjs-2 and React-Router.
+- **React (Material UI)**: Styles frontend of the app using Material UI components, with additional React libraries used such as React-Chartjs-2, React-Router and React-Redux.
 - **MongoDB Atlas**: Stores all the information pertaining to each user and their run statistics (attributes includes name, date, distance, duration, pace).
 - **Express.js + Node.js**: Contains models for URL routing as well as providing export functionality to allow client to save run data as a CSV file.
+- **JWT + Google OAuth**: Allows users to create profiles either with custom information or using existing their Google account.
 
 ## Installation
 
@@ -71,6 +72,5 @@ The app should now be running locally!
 
 My goal for this project is to continually improve it with additional features, the following having highest priority:
 
-- User authentication (runners can make their own profiles)
 - Increasing customizability based on runner's experience (ie. user can choose between beginner/intermediate/advanced)
 - Implement a working scheduling system, with runner being able to set notifications and reminders
